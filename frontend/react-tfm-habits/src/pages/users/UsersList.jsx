@@ -1,110 +1,105 @@
 import { useEffect, useState } from "react";
 import { getUsers } from "../../services/usersService";
+import { useNavigate } from "react-router-dom";
+import styles from "./UsersList.module.css";
 
 export default function UsersList() {
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadUsers();
     }, []);
 
     async function loadUsers() {
-        const data = await getUsers(
-            search,
-            0,
-            10
-        );
-
+        const data = await getUsers(search, 0, 10);
         setUsers(data.content);
     }
 
+    function handleRowClick(userId) {
+        navigate(`/users/${userId}`);
+    }
+
     return (
-        <div style={{ padding: "20px" }}>
+        <div className={styles.container}>
             <h1>Users list</h1>
 
-            <div
-                style={{
-                    display: "flex",
-                    gap: "10px",
-                    marginBottom: "20px"
-                }}
-            >
-                <input
-                    placeholder="Buscar"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    style={{
-                        padding: "8px",
-                        width: "250px"
-                    }}
-                />
+            {/* SEARCH */}
+            <div className={styles.searchWrapper}>
+                <div className={styles.searchBox}>
+                    <input
+                        className={styles.input}
+                        placeholder="Search users..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
 
-                <button
-                    onClick={loadUsers}
-                    style={{
-                        padding: "8px 16px",
-                        cursor: "pointer"
-                    }}
-                >
-                    Buscar
-                </button>
+                    <button
+                        className={styles.button}
+                        onClick={loadUsers}
+                    >
+                        Search
+                    </button>
+                </div>
             </div>
 
-            <table
-                style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    boxShadow: "0 0 5px rgba(0,0,0,0.1)"
-                }}
-            >
-                <thead>
-                <tr
-                    style={{
-                        background: "#f3f3f3"
-                    }}
-                >
-                    <th style={thStyle}>First Name</th>
-                    <th style={thStyle}>Last Name</th>
-                    <th style={thStyle}>Age</th>
-                </tr>
-                </thead>
-
-                <tbody>
-                {users.length > 0 ? (
-                    users.map((user) => (
-                        <tr key={user.id}>
-                            <td style={tdStyle}>{user.firstName}</td>
-                            <td style={tdStyle}>{user.lastName}</td>
-                            <td style={tdStyle}>{user.age}</td>
+            {/* TABLE */}
+            <div style={{ width: "100%", marginTop: "20px" }}>
+                {/* TABLE */}
+                <div style={{ width: "100%", marginTop: "20px" }}>
+                    <table className={styles.table}>
+                        <thead>
+                        <tr className={styles.headerRow}>
+                            <th className={styles.th}>First Name</th>
+                            <th className={styles.th}>Last Name</th>
+                            <th className={styles.th}>Age</th>
+                            <th className={styles.th}>Actions</th>
                         </tr>
-                    ))
-                ) : (
-                    <tr>
-                        <td
-                            colSpan="3"
-                            style={{
-                                padding: "20px",
-                                textAlign: "center"
-                            }}
-                        >
-                            No users found
-                        </td>
-                    </tr>
-                )}
-                </tbody>
-            </table>
+                        </thead>
+
+                        <tbody>
+                        {users.length > 0 ? (
+                            users.map((user) => (
+                                <tr
+                                    key={user.id}
+                                    className={styles.row}
+                                >
+                                    <td className={styles.td}>
+                                        {user.firstName}
+                                    </td>
+
+                                    <td className={styles.td}>
+                                        {user.lastName}
+                                    </td>
+
+                                    <td className={styles.td}>
+                                        {user.age}
+                                    </td>
+
+                                    <td className={styles.td}>
+                                        <button
+                                            className={styles.detailsBtn}
+                                            onClick={() =>
+                                                navigate(`/users/${user.id}`)
+                                            }
+                                        >
+                                            View Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan="4" className={styles.empty}>
+                                    No users found
+                                </td>
+                            </tr>
+                        )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 }
-
-const thStyle = {
-    border: "1px solid #ddd",
-    padding: "12px",
-    textAlign: "left"
-};
-
-const tdStyle = {
-    border: "1px solid #ddd",
-    padding: "10px"
-};

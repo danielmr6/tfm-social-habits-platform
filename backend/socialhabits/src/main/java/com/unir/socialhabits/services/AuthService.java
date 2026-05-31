@@ -2,6 +2,7 @@ package com.unir.socialhabits.services;
 
 import com.unir.socialhabits.dto.LoginRequestDTO;
 import com.unir.socialhabits.dto.LoginResponseDTO;
+import com.unir.socialhabits.dto.RegisterProfessionalDTO;
 import com.unir.socialhabits.entities.Professional;
 import com.unir.socialhabits.entities.PasswordResetToken;
 import com.unir.socialhabits.repositories.ProfessionalRepository;
@@ -11,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
-import java.util.UUID;   // <- ESTA LÍNEA
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class AuthService {
         Professional professional = professionalRepository
                 .findByEmail(request.getEmail())
                 .orElseThrow(() ->
-                        new RuntimeException("Usuario no encontrado"));
+                        new RuntimeException("User not found"));
 
         boolean validPassword = passwordEncoder.matches(
                 request.getPassword(),
@@ -37,10 +38,10 @@ public class AuthService {
         );
 
         if (!validPassword) {
-            throw new RuntimeException("Password incorrecta");
+            throw new RuntimeException("Incorrect password");
         }
 
-        String token = jwtService.generateToken(professional);
+        String token = jwtService.generateToken(professional.getEmail());
 
         return new LoginResponseDTO(token);
     }
@@ -110,6 +111,53 @@ public class AuthService {
 
         tokenRepository.delete(
                 resetToken
+        );
+
+    }
+
+    public void register(
+            RegisterProfessionalDTO dto
+    ){
+
+        boolean exists =
+                professionalRepository
+                        .findByEmail(
+                                dto.getEmail()
+                        )
+                        .isPresent();
+
+        if(exists){
+
+            throw new RuntimeException(
+                    "Email already exists"
+            );
+
+        }
+
+        Professional professional =
+
+                Professional.builder()
+
+                        .name(
+                                dto.getName()
+                        )
+
+                        .email(
+                                dto.getEmail()
+                        )
+
+                        .password(
+
+                                passwordEncoder.encode(
+                                        dto.getPassword()
+                                )
+
+                        )
+
+                        .build();
+
+        professionalRepository.save(
+                professional
         );
 
     }

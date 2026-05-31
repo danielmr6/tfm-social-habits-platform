@@ -31,3 +31,26 @@ export async function createUser(user){
     return response.data;
 
 }
+
+export async function getUserById(id) {
+    const res = await api.get(`/users/${id}`);
+    return res.data;
+}
+
+export async function deleteUser(id) {
+    const res = await api.delete(`/users/${id}`);
+    return res.data;
+}
+
+export async function updateUser(
+    id,
+    user
+) {
+
+    const response = await api.put(
+        `/users/${id}`,
+        user
+    );
+
+    return response.data;
+}

@@ -2,10 +2,7 @@ package com.unir.socialhabits.controllers;
 
 import com.unir.socialhabits.services.UserService;
 
-import com.unir.socialhabits.dto.LoginRequestDTO;
-import com.unir.socialhabits.dto.LoginResponseDTO;
-import com.unir.socialhabits.dto.CreateUserDTO;
-import com.unir.socialhabits.dto.UserDTO;
+import com.unir.socialhabits.dto.*;
 import com.unir.socialhabits.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -14,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
@@ -31,6 +29,25 @@ public class UsersController {
         return ResponseEntity.ok(
                 userService.createUser(dto)
         );
+    }
+
+    @GetMapping("/{id}")
+    public UserDetailDTO getUser(@PathVariable UUID id) {
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUser(
+            @PathVariable UUID id,
+            @RequestBody UpdateUserDTO dto
+    ) {
+        userService.update(id, dto);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUser(@PathVariable UUID id) {
+        userService.deleteUser(id);
     }
 
     @GetMapping

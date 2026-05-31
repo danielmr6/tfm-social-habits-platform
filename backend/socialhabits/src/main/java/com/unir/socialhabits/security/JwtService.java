@@ -14,81 +14,40 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    // ⚠️ Cambia esto en producción
-    private static final String SECRET_KEY =
-            "mysecretkeymysecretkeymysecretkey12345";
-
-    private static final long EXPIRATION_TIME =
-            1000 * 60 * 60 * 24; // 24h
+    private static final String SECRET_KEY = "mysecretkeymysecretkeymysecretkey12345";
+    private static final long EXPIRATION_TIME = 1000 * 60 * 60 * 24;
 
     private Key getSigningKey() {
-
-        return Keys.hmacShaKeyFor(
-                SECRET_KEY.getBytes()
-        );
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // GENERAR TOKEN
-    public String generateToken(Professional professional) {
-
+    public String generateToken(String email) {
         return Jwts.builder()
-
-                .setSubject(professional.getEmail())
-
-                .claim("role", professional.getRole())
-
-                .claim("name", professional.getName())
-
+                .setSubject(email)
                 .setIssuedAt(new Date())
-
-                .setExpiration(
-                        new Date(
-                                System.currentTimeMillis()
-                                        + EXPIRATION_TIME
-                        )
-                )
-
-                .signWith(
-                        getSigningKey(),
-                        SignatureAlgorithm.HS256
-                )
-
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // EXTRAER EMAIL
     public String extractUsername(String token) {
-
-        return extractAllClaims(token)
-                .getSubject();
+        return extractClaims(token).getSubject();
     }
 
-    // VALIDAR TOKEN
-    public boolean isTokenValid(String token) {
-
+    public boolean isValid(String token) {
         try {
-
-            extractAllClaims(token);
-
+            extractClaims(token);
             return true;
-
         } catch (Exception e) {
-
             return false;
         }
     }
 
-    // EXTRAER CLAIMS
-    private Claims extractAllClaims(String token) {
-
+    private Claims extractClaims(String token) {
         return Jwts.parserBuilder()
-
                 .setSigningKey(getSigningKey())
-
                 .build()
-
                 .parseClaimsJws(token)
-
                 .getBody();
     }
 }

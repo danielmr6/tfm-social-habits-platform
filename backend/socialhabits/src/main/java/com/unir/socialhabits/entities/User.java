@@ -2,11 +2,14 @@ package com.unir.socialhabits.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "users")
+@Table(name="users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,4 +30,15 @@ public class User {
     private String phoneNumber;
 
     private String generalObservations;
+
+    @ManyToOne
+    @JsonBackReference
+    private Professional professional;
+
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Habit> habits;
+
+    @OneToMany(mappedBy = "user")
+    private List<Observation> observations;
 }

@@ -1,0 +1,334 @@
+.container {
+
+    max-width: 1100px;
+
+    margin: 0 auto;
+
+    padding: 30px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 28px;
+
+}
+
+/* HEADER */
+
+.header {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+
+    flex-wrap: wrap;
+
+}
+
+.title {
+
+    margin: 0;
+
+    font-size: 34px;
+
+    font-weight: 700;
+
+}
+
+.subtitle {
+
+    color: #666;
+
+    margin-top: 6px;
+
+}
+
+/* ACTION BUTTONS */
+
+.actions {
+
+    display: flex;
+
+    gap: 12px;
+
+}
+
+.editBtn,
+.deleteBtn {
+
+    border: none;
+
+    padding: 12px 18px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    transition: .2s;
+
+}
+
+.editBtn {
+
+    background: #2563eb;
+
+    color: white;
+
+}
+
+.editBtn:hover {
+
+    background: #1d4ed8;
+
+}
+
+.deleteBtn {
+
+    background: #dc2626;
+
+    color: white;
+
+}
+
+.deleteBtn:hover {
+
+    background: #b91c1c;
+
+}
+
+.deleteBtn:disabled {
+
+    opacity: .6;
+
+    cursor: not-allowed;
+
+}
+
+/* CARD */
+
+.card {
+
+    background: white;
+
+    padding: 24px;
+
+    border-radius: 14px;
+
+    box-shadow:
+
+            0 2px 8px rgba(0,0,0,.08);
+
+}
+
+.infoRow {
+
+    padding: 12px 0;
+
+    border-bottom: 1px solid #eee;
+
+}
+
+.infoRow:last-child {
+
+    border-bottom: none;
+
+}
+
+.infoRow span {
+
+    display: block;
+
+    color: #666;
+
+    margin-bottom: 4px;
+
+}
+
+/* SECTIONS */
+
+.section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+
+}
+
+.section h3 {
+
+    margin: 0;
+
+    font-size: 24px;
+
+}
+
+/* HABITS GRID */
+
+.grid {
+
+    display: grid;
+
+    grid-template-columns:
+
+        repeat(
+            auto-fill,
+            minmax(260px,1fr)
+        );
+
+    gap: 16px;
+
+}
+
+.habitCard {
+
+    background: white;
+
+    padding: 18px;
+
+    border-radius: 12px;
+
+    box-shadow:
+
+            0 2px 6px rgba(0,0,0,.06);
+
+}
+
+.badge {
+
+    display: inline-block;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #e8efff;
+
+    color: #2563eb;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    margin-bottom: 12px;
+
+}
+
+/* OBSERVATIONS */
+
+.timeline {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+
+}
+
+.obsItem {
+
+    background: white;
+
+    border-left: 4px solid #2563eb;
+
+    padding: 18px;
+
+    border-radius: 8px;
+
+    box-shadow:
+
+            0 2px 6px rgba(0,0,0,.05);
+
+}
+
+.obsHeader {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    margin-bottom: 10px;
+
+}
+
+.obsHeader span {
+
+    font-weight: 600;
+
+}
+
+.obsHeader small {
+
+    color: #777;
+
+}
+
+/* EMPTY */
+
+.empty {
+
+    color: #777;
+
+}
+
+/* LOADING */
+
+.center {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    height: 300px;
+
+}
+
+.loading {
+
+    color: #666;
+
+}
+
+.error {
+
+    color: red;
+
+}
+
+/* MOBILE */
+
+@media (max-width:700px){
+
+    .header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .actions{
+
+        width:100%;
+
+    }
+
+    .editBtn,
+    .deleteBtn{
+
+        flex:1;
+
+    }
+
+}

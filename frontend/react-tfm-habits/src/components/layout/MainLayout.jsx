@@ -34,10 +34,8 @@ export default function MainLayout() {
         <div className={styles.container}>
             <header className={styles.header}>
 
-                <div>
-
-                    SocialHabits
-
+                <div className={styles.brand}>
+                    Social<span>Habits</span>
                 </div>
 
                 <button
@@ -54,42 +52,20 @@ export default function MainLayout() {
 
             </header>
             <div className={styles.body}>
-
                 <aside className={styles.sidebar}>
-
-                    <Link to="/users">
-
-                        Users
-
-                    </Link>
-
                 </aside>
 
                 <main className={styles.content}>
-
                     <Outlet />
-
                 </main>
 
             </div>
 
             {!hideFab && (
-
-                <Link
-                    to="/users/new"
-                    className={styles.fab}
-                >
-
+                <Link to="/users/new" className={styles.leftFab}>
                     <span>+</span>
-
-                    <span>
-
-                        Add New User
-
-                    </span>
-
+                    <span>Add User</span>
                 </Link>
-
             )}
 
         </div>

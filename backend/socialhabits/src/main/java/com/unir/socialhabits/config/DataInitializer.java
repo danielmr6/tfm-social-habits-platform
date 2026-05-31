@@ -23,7 +23,6 @@ public class DataInitializer implements CommandLineRunner {
                     .name("Admin")
                     .email("admin@test.com")
                     .password(passwordEncoder.encode("1234"))
-                    .role("ADMIN")
                     .build();
 
             professionalRepository.save(professional);

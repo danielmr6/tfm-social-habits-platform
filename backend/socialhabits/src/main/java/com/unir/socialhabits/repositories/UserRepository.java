@@ -9,8 +9,19 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    Page<User> findByFirstNameContainingIgnoreCase(
-            String firstName,
+    Page<User> findByProfessionalId(
+            Long professionalId,
             Pageable pageable
+    );
+
+    Page<User>
+    findByProfessionalIdAndFirstNameContainingIgnoreCase(
+
+            Long professionalId,
+
+            String search,
+
+            Pageable pageable
+
     );
 }

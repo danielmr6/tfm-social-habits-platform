@@ -1,15 +1,22 @@
 package com.unir.socialhabits.services;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+
 import org.springframework.stereotype.Service;
 
-import com.unir.socialhabits.dto.CreateUserDTO;
-import com.unir.socialhabits.dto.UserDTO;
-import com.unir.socialhabits.entities.User;
+import com.unir.socialhabits.dto.*;
+import com.unir.socialhabits.entities.*;
+
 import com.unir.socialhabits.repositories.UserRepository;
+import com.unir.socialhabits.repositories.ProfessionalRepository;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,45 +24,270 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public UserDTO createUser(CreateUserDTO dto) {
+    private final ProfessionalRepository professionalRepository;
+
+    private Professional getLoggedProfessional() {
+
+        String email =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication()
+                        .getName();
+
+        return professionalRepository
+
+                .findByEmail(email)
+
+                .orElseThrow(
+                        () -> new RuntimeException(
+                                "Professional not found"
+                        )
+                );
+
+    }
+
+    public UserDetailDTO getUserById(UUID id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return toDetailDTO(user);
+    }
+
+    public UserDetailDTO updateUser(UUID id, UpdateUserDTO dto) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow();
+
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setAge(dto.getAge());
+
+        userRepository.save(user);
+
+        return toDetailDTO(user);
+    }
+
+    public void deleteUser(UUID id) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow();
+
+        userRepository.delete(user);
+    }
+
+    public UserDTO createUser(
+            CreateUserDTO dto
+    ) {
+
+        Professional professional =
+                getLoggedProfessional();
 
         User user = User.builder()
-                .firstName(dto.getFirstName())
-                .lastName(dto.getLastName())
-                .age(dto.getAge())
-                .phoneNumber(dto.getPhoneNumber())
-                .generalObservations(dto.getGeneralObservations())
+
+                .firstName(
+                        dto.getFirstName()
+                )
+
+                .lastName(
+                        dto.getLastName()
+                )
+
+                .age(
+                        dto.getAge()
+                )
+
+                .phoneNumber(
+                        dto.getPhoneNumber()
+                )
+
+                .generalObservations(
+                        dto.getGeneralObservations()
+                )
+
+                .professional(
+                        professional
+                )
+
                 .build();
 
-        User savedUser = userRepository.save(user);
+        User savedUser =
+                userRepository.save(
+                        user
+                );
 
-        return mapToDTO(savedUser);
+        return mapToDTO(
+                savedUser
+        );
+
     }
 
-    public Page<UserDTO> getUsers(String search, int page, int size) {
+    public UserDetailDTO getUserDetail(UUID id) {
 
-        Pageable pageable = PageRequest.of(page, size);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (search == null || search.isBlank()) {
-            return userRepository.findAll(pageable)
-                    .map(this::mapToDTO);
-        }
-
-        return userRepository
-                .findByFirstNameContainingIgnoreCase(search, pageable)
-                .map(this::mapToDTO);
-    }
-
-    private UserDTO mapToDTO(User user) {
-
-        UserDTO dto = new UserDTO();
+        UserDetailDTO dto = new UserDetailDTO();
 
         dto.setId(user.getId());
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setAge(user.getAge());
-        dto.setPhoneNumber(user.getPhoneNumber());
+
+        // habits
+        dto.setHabits(
+                user.getHabits().stream().map(h -> {
+                    HabitDTO hd = new HabitDTO();
+                    hd.setId(h.getId());
+                    hd.setType(h.getType());
+                    hd.setStatus(h.getStatus());
+                    hd.setDescription(h.getDescription());
+                    return hd;
+                }).toList()
+        );
+
+        // observations
+        dto.setObservations(
+                user.getObservations().stream().map(o -> {
+                    ObservationDTO od = new ObservationDTO();
+                    od.setId(o.getId());
+                    od.setContent(o.getContent());
+                    od.setCreatedAt(o.getCreatedAt());
+                    od.setProfessionalName(o.getProfessional().getName());
+                    return od;
+                }).toList()
+        );
 
         return dto;
+    }
+
+    public Page<UserDTO> getUsers(
+            String search,
+            int page,
+            int size
+    ) {
+
+        Pageable pageable =
+                PageRequest.of(
+                        page,
+                        size
+                );
+
+        Professional professional =
+                getLoggedProfessional();
+
+        if (
+                search == null ||
+                        search.isBlank()
+        ) {
+
+            return userRepository
+
+                    .findByProfessionalId(
+                            professional.getId(),
+                            pageable
+                    )
+
+                    .map(
+                            this::mapToDTO
+                    );
+
+        }
+
+        return userRepository
+
+                .findByProfessionalIdAndFirstNameContainingIgnoreCase(
+
+                        professional.getId(),
+
+                        search,
+
+                        pageable
+
+                )
+
+                .map(
+                        this::mapToDTO
+                );
+
+    }
+
+    public UserDetailDTO toDetailDTO(User user) {
+
+        UserDetailDTO dto = new UserDetailDTO();
+
+        dto.setId(user.getId());
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setAge(user.getAge());
+
+        dto.setHabits(
+                user.getHabits().stream().map(h -> {
+                    HabitDTO hd = new HabitDTO();
+                    hd.setId(h.getId());
+                    hd.setType(h.getType());
+                    hd.setStatus(h.getStatus());
+                    hd.setDescription(h.getDescription());
+                    hd.setDate(h.getDate());
+                    return hd;
+                }).toList()
+        );
+
+        dto.setObservations(
+                user.getObservations().stream().map(o -> {
+                    ObservationDTO od = new ObservationDTO();
+                    od.setId(o.getId());
+                    od.setContent(o.getContent());
+                    od.setCreatedAt(o.getCreatedAt());
+                    od.setProfessionalName(
+                            o.getProfessional().getName()
+                    );
+                    return od;
+                }).toList()
+        );
+
+        return dto;
+    }
+
+    private UserDTO mapToDTO(
+            User user
+    ) {
+
+        UserDTO dto =
+                new UserDTO();
+
+        dto.setId(
+                user.getId()
+        );
+
+        dto.setFirstName(
+                user.getFirstName()
+        );
+
+        dto.setLastName(
+                user.getLastName()
+        );
+
+        dto.setAge(
+                user.getAge()
+        );
+
+        dto.setPhoneNumber(
+                user.getPhoneNumber()
+        );
+
+        return dto;
+    }
+
+    public void update(UUID id, UpdateUserDTO dto) {
+
+        User user = userRepository.findById(id)
+                .orElseThrow();
+
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setAge(dto.getAge());
+
+        userRepository.save(user);
     }
 }

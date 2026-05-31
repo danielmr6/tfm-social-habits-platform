@@ -2,6 +2,7 @@ package com.unir.socialhabits.controllers;
 
 import com.unir.socialhabits.dto.LoginRequestDTO;
 import com.unir.socialhabits.dto.LoginResponseDTO;
+import com.unir.socialhabits.dto.RegisterProfessionalDTO;
 import com.unir.socialhabits.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,23 @@ public class AuthController {
         );
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(
+
+            @RequestBody
+            RegisterProfessionalDTO dto
+
+    ){
+
+        authService.register(
+                dto
+        );
+
+        return ResponseEntity
+                .ok()
+                .build();
+
     }
 }
