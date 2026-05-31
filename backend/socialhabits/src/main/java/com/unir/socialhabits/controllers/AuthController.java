@@ -25,4 +25,28 @@ public class AuthController {
                 authService.login(request)
         );
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(
+            @RequestParam String email
+    ) {
+
+        authService.sendPasswordReset(email);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(
+            @RequestParam String token,
+            @RequestParam String newPassword
+    ) {
+
+        authService.resetPassword(
+                token,
+                newPassword
+        );
+
+        return ResponseEntity.ok().build();
+    }
 }

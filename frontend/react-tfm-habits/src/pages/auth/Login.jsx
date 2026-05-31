@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 export default function Login() {
 
     const [email, setEmail] = useState("");
+
     const [password, setPassword] = useState("");
 
     const { loginUser } = useContext(AuthContext);
@@ -13,46 +14,162 @@ export default function Login() {
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
+
+
         e.preventDefault();
 
         try {
 
-            const data = await login(email, password);
+            const data = await login(
+                email,
+                password
+            );
 
-            loginUser(data.token);
+            loginUser(
+                data.token
+            );
 
-            navigate("/dashboard");
+            navigate("/users");
 
         } catch (error) {
+
             console.log(error);
-            alert("Credenciales incorrectas");
+
+            alert(
+                "Incorrect credentials"
+            );
 
         }
+
     };
 
     return (
-        <div className="login-page">
-            <h1>SocialHabits</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Correo electrónico"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
 
-                <input
-                    type="password"
-                    placeholder="Contraseña"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+        <div
+            style={{
+                maxWidth: "450px",
+                margin: "80px auto",
+                padding: "30px",
+                border: "1px solid #ddd",
+                borderRadius: "12px",
+                boxShadow:
+                    "0 2px 10px rgba(0,0,0,0.1)"
+            }}
+        >
 
-                <button type="submit">
-                    Iniciar sesión
+            <h1
+                style={{
+                    textAlign: "center",
+                    marginBottom: "10px"
+                }}
+            >
+
+                SocialHabits
+
+            </h1>
+
+            <p
+                style={{
+                    textAlign: "center",
+                    color: "#666",
+                    marginBottom: "30px"
+                }}
+            >
+
+                Sign in to continue
+
+            </p>
+
+            <form
+                onSubmit={handleSubmit}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "20px"
+                }}
+            >
+
+                <div>
+
+                    <label>
+
+                        Email
+
+                    </label>
+
+                    <input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={
+                            e=>setEmail(
+                                e.target.value
+                            )
+                        }
+                        style={inputStyle}
+                    />
+
+                </div>
+
+                <div>
+
+                    <label>
+
+                        Password
+
+                    </label>
+
+                    <input
+                        type="password"
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={
+                            e=>setPassword(
+                                e.target.value
+                            )
+                        }
+                        style={inputStyle}
+                    />
+
+                </div>
+
+                <button
+                    type="submit"
+                    style={{
+                        padding: "12px",
+                        border: "none",
+                        borderRadius: "6px",
+                        background: "#2563eb",
+                        color: "white",
+                        fontSize: "16px",
+                        cursor: "pointer"
+                    }}
+                >
+
+                    Login
+
                 </button>
 
             </form>
+
         </div>
+
     );
+
 }
+
+const inputStyle = {
+
+    width: "100%",
+
+    padding: "10px",
+
+    marginTop: "6px",
+
+    border: "1px solid #ccc",
+
+    borderRadius: "6px",
+
+    boxSizing: "border-box"
+
+};

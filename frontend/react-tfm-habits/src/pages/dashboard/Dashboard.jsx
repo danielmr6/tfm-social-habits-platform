@@ -5,7 +5,7 @@ export default function Dashboard() {
 
             <h1>Dashboard</h1>
 
-            <p>Usuario autenticado correctamente</p>
+            <p>User authenticated successfully</p>
 
         </div>
     );

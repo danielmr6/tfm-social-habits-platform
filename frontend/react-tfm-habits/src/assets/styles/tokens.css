@@ -1,0 +1,13 @@
+:root {
+    --color-primary: #131921;
+    --color-secondary: #232f3e;
+    --color-bg: #f5f5f5;
+    --color-card: #ffffff;
+
+    --text-primary: #111;
+    --text-light: #fff;
+
+    --radius: 8px;
+
+    --shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
