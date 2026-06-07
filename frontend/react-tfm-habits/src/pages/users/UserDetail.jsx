@@ -15,17 +15,12 @@ import styles from "./UserDetail.module.css";
 export default function UserDetail() {
 
     const { id } = useParams();
-
     const navigate = useNavigate();
 
     const [user, setUser] = useState(null);
-
     const [loading, setLoading] = useState(true);
-
     const [deleting, setDeleting] = useState(false);
-
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-
     const [selectedHabit, setSelectedHabit] = useState(null);
 
     useEffect(() => {
@@ -35,205 +30,121 @@ export default function UserDetail() {
     async function loadUser() {
 
         try {
-
             setLoading(true);
 
-            const data =
-                await getUserById(id);
-
+            const data = await getUserById(id);
             setUser(data);
 
         } catch (err) {
-
             console.error(err);
-
             setUser(null);
-
         } finally {
-
             setLoading(false);
-
         }
-
     }
 
     function getStatusClass(status) {
-
         switch (status) {
-
             case "OK":
                 return styles.ok;
-
             case "WARNING":
                 return styles.warning;
-
             case "CRITICAL":
                 return styles.critical;
-
             default:
                 return "";
         }
-
     }
 
     function handleDeleteUser() {
-
         setSelectedHabit(null);
-
         setShowDeleteModal(true);
-
     }
 
     async function confirmDelete() {
 
         try {
-
             setDeleting(true);
 
             if (selectedHabit) {
 
-                await deleteHabit(
-                    selectedHabit
-                );
-
+                await deleteHabit(selectedHabit);
                 await loadUser();
 
             } else {
 
                 await deleteUser(id);
-
                 navigate("/users");
 
             }
 
         } catch (err) {
-
             console.error(err);
-
             alert("Delete failed");
-
         } finally {
-
             setDeleting(false);
-
             setShowDeleteModal(false);
-
             setSelectedHabit(null);
-
         }
-
     }
 
-    async function handleDeleteHabit(habitId) {
-
+    function handleDeleteHabit(habitId) {
         setSelectedHabit(habitId);
-
         setShowDeleteModal(true);
-
     }
 
     if (loading) {
-
         return (
-
             <div className={styles.center}>
-
-                <p>
-
-                    Loading user...
-
-                </p>
-
+                <p>Loading user...</p>
             </div>
-
         );
-
     }
 
     if (!user) {
-
         return (
-
             <div className={styles.center}>
-
-                <p className={styles.error}>
-
-                    User not found
-
-                </p>
-
+                <p className={styles.error}>User not found</p>
             </div>
-
         );
-
     }
 
     return (
-
         <div className={styles.container}>
 
-            {/* DELETE USER MODAL */}
-
+            {/* MODAL */}
             {showDeleteModal && (
-
                 <div className={styles.modalOverlay}>
-
                     <div className={styles.confirmCard}>
 
                         <h2>
-
-                            {
-
-                                selectedHabit
-
-                                    ?
-
-                                    "Delete Habit"
-
-                                    :
-
-                                    "Delete User"
-
-                            }
-
+                            {selectedHabit ? "Delete Habit" : "Delete User"}
                         </h2>
 
                         <p>
-
-                            {
-
-                                selectedHabit
-
+                            {selectedHabit ? (
+                                "Are you sure you want to delete this habit?"
+                            ) : (
+                                <>
+                                    Are you sure you want to delete{" "}
+                                    <strong>
+                                        {user.firstName} {user.lastName}
+                                    </strong>
                                     ?
-
-                                    "Are you sure you want to delete this habit?"
-
-                                    :
-
-                                    <>
-                                        Are you sure you want to delete{" "}
-                                        <strong>
-                                            {user.firstName} {user.lastName}
-                                        </strong>
-                                        ?
-                                    </>
-
-                            }
-
+                                </>
+                            )}
                         </p>
 
                         <div className={styles.modalActions}>
 
                             <button
-                                onClick={()=>{
+                                onClick={() => {
                                     setShowDeleteModal(false);
                                     setSelectedHabit(null);
                                 }}
                                 className={styles.cancelBtn}
                             >
-
                                 Cancel
-
                             </button>
 
                             <button
@@ -241,432 +152,184 @@ export default function UserDetail() {
                                 onClick={confirmDelete}
                                 disabled={deleting}
                             >
-
-                                {
-
-                                    deleting
-
-                                        ?
-
-                                        "Deleting..."
-
-                                        :
-
-                                        "Delete"
-
-                                }
-
+                                {deleting ? "Deleting..." : "Delete"}
                             </button>
 
                         </div>
-
                     </div>
-
                 </div>
-
             )}
 
             {/* HEADER */}
-
             <div className={styles.header}>
 
                 <div>
-
                     <h1 className={styles.title}>
-
-                        {user.firstName}
-
-                        {" "}
-
-                        {user.lastName}
-
+                        {user.firstName} {user.lastName}
                     </h1>
 
                     <p className={styles.subtitle}>
-
                         User details & activity overview
-
                     </p>
-
                 </div>
 
                 <div className={styles.actions}>
 
                     <button
                         className={styles.editBtn}
-                        onClick={() =>
-                            navigate(
-                                `/users/${id}/edit`
-                            )
-                        }
+                        onClick={() => navigate(`/users/${id}/edit`)}
                     >
-
                         Edit User
-
                     </button>
 
                     <button
                         className={styles.deleteBtn}
                         onClick={handleDeleteUser}
                     >
-
                         Delete User
-
                     </button>
 
                     <button
                         className={styles.editBtn}
-                        onClick={() =>
-                            navigate(
-                                `/users/${id}/habits/new`
-                            )
-                        }
+                        onClick={() => navigate(`/users/${id}/habits/new`)}
                     >
-
                         Add Habit
-
                     </button>
 
                 </div>
-
             </div>
 
             {/* STATUS */}
-
             {user.habitStatus && (
-
-                <div
-                    className={`${styles.statusBanner}
-                    ${getStatusClass(
-                        user.habitStatus
-                    )}`}
-                >
+                <div className={`${styles.statusBanner} ${getStatusClass(user.habitStatus)}`}>
 
                     <div>
-
-                        {
-
-                            user.habitStatus === "OK"
-
-                            &&
-
-                            "🟢 Good habit compliance"
-
-                        }
-
-                        {
-
-                            user.habitStatus === "WARNING"
-
-                            &&
-
-                            "🟡 Irregular habits detected"
-
-                        }
-
-                        {
-
-                            user.habitStatus === "CRITICAL"
-
-                            &&
-
-                            "🔴 Attention: missing habits"
-
-                        }
-
+                        {user.habitStatus === "OK" && "🟢 Good habit compliance"}
+                        {user.habitStatus === "WARNING" && "🟡 Irregular habits detected"}
+                        {user.habitStatus === "CRITICAL" && "🔴 Attention: missing habits"}
                     </div>
 
-                    {
+                    {user.hasRiskyHabitsToday && (
+                        <div className={styles.alert}>
+                            ⚠ Negative habits today
+                        </div>
+                    )}
 
-                        user.hasMissingTodayHabits && (
-
-                            <div className={styles.alert}>
-
-                                ⚠ Today habits not completed
-
-                            </div>
-
-                        )
-
-                    }
+                    {user.hasMissingTodayHabits && (
+                        <div className={styles.alert}>
+                            ❌ Today habits not completed
+                        </div>
+                    )}
 
                 </div>
-
             )}
 
             {/* INFO */}
-
             <div className={styles.card}>
 
                 <div className={styles.infoRow}>
-
-                    <span>
-
-                        Age
-
-                    </span>
-
-                    <strong>
-
-                        {user.age}
-
-                    </strong>
-
+                    <span>Age</span>
+                    <strong>{user.age}</strong>
                 </div>
 
                 <div className={styles.infoRow}>
-
-                    <span>
-
-                        Phone
-
-                    </span>
-
-                    <strong>
-
-                        {
-
-                            user.phoneNumber || "-"
-
-                        }
-
-                    </strong>
-
+                    <span>Phone</span>
+                    <strong>{user.phoneNumber || "-"}</strong>
                 </div>
 
                 <div className={styles.infoRow}>
-
-                    <span>
-
-                        General notes
-
-                    </span>
-
-                    <p>
-
-                        {
-
-                            user.generalObservations ||
-
-                            "No observations"
-
-                        }
-
-                    </p>
-
+                    <span>General notes</span>
+                    <p>{user.generalObservations || "No observations"}</p>
                 </div>
 
             </div>
 
             {/* HABITS */}
-
             <div className={styles.section}>
 
                 <div className={styles.sectionHeader}>
-
-                    <h3>
-
-                        Habits
-
-                    </h3>
+                    <h3>Habits</h3>
 
                     <span className={styles.globalStatus}>
-
-                        Status:
-
-                        {" "}
-
-                        {user.habitStatus}
-
+                        Status: {user.habitStatus}
                     </span>
-
                 </div>
 
-                {
+                {user.habits?.length > 0 ? (
+                    <div className={styles.grid}>
 
-                    user.habits?.length > 0
+                        {user.habits.map((h) => (
+                            <div key={h.id} className={styles.habitCard}>
 
-                        ?
+                                <div className={styles.badge}>
+                                    {h.type}
+                                </div>
 
-                        (
+                                <p><b>Status:</b> {h.status}</p>
 
-                            <div className={styles.grid}>
+                                <p>
+                                    <b>Date:</b>{" "}
+                                    {h.date
+                                        ? new Date(h.date).toLocaleDateString()
+                                        : "-"}
+                                </p>
 
-                                {
+                                <p>{h.description}</p>
 
-                                    user.habits.map(h => (
-
-                                        <div
-                                            key={h.id}
-                                            className={styles.habitCard}
-                                        >
-
-                                            <div className={styles.badge}>
-
-                                                {h.type}
-
-                                            </div>
-
-                                            <p>
-
-                                                <b>Status:</b>
-
-                                                {" "}
-
-                                                {h.status}
-
-                                            </p>
-
-                                            <p>
-
-                                                <b>Date:</b>
-
-                                                {" "}
-
-                                                {
-
-                                                    new Date(
-                                                        h.date
-                                                    ).toLocaleDateString()
-
-                                                }
-
-                                            </p>
-
-                                            <p>
-
-                                                {h.description}
-
-                                            </p>
-
-                                            <button
-                                                className={styles.deleteHabitBtn}
-                                                onClick={() =>
-                                                    handleDeleteHabit(
-                                                        h.id
-                                                    )
-                                                }
-                                            >
-
-                                                Delete Habit
-
-                                            </button>
-
-                                        </div>
-
-                                    ))
-
-                                }
+                                <button
+                                    className={styles.deleteHabitBtn}
+                                    onClick={() => handleDeleteHabit(h.id)}
+                                >
+                                    Delete Habit
+                                </button>
 
                             </div>
+                        ))}
 
-                        )
-
-                        :
-
-                        (
-
-                            <p className={styles.empty}>
-
-                                No habits registered
-
-                            </p>
-
-                        )
-
-                }
+                    </div>
+                ) : (
+                    <p className={styles.empty}>
+                        No habits registered
+                    </p>
+                )}
 
             </div>
 
             {/* OBSERVATIONS */}
-
             <div className={styles.section}>
 
-                <h3>
+                <h3>Observations</h3>
 
-                    Observations
+                {user.observations?.length > 0 ? (
+                    <div className={styles.timeline}>
 
-                </h3>
+                        {user.observations.map((o) => (
+                            <div key={o.id} className={styles.obsItem}>
 
-                {
+                                <div className={styles.obsHeader}>
+                                    <span>{o.professionalName}</span>
 
-                    user.observations?.length > 0
+                                    <small>
+                                        {o.createdAt
+                                            ? new Date(o.createdAt).toLocaleDateString()
+                                            : "-"}
+                                    </small>
+                                </div>
 
-                        ?
-
-                        (
-
-                            <div className={styles.timeline}>
-
-                                {
-
-                                    user.observations.map(o => (
-
-                                        <div
-                                            key={o.id}
-                                            className={styles.obsItem}
-                                        >
-
-                                            <div className={styles.obsHeader}>
-
-                                                <span>
-
-                                                    {
-
-                                                        o.professionalName
-
-                                                    }
-
-                                                </span>
-
-                                                <small>
-
-                                                    {
-
-                                                        new Date(
-                                                            o.createdAt
-                                                        ).toLocaleDateString()
-
-                                                    }
-
-                                                </small>
-
-                                            </div>
-
-                                            <p>
-
-                                                {o.content}
-
-                                            </p>
-
-                                        </div>
-
-                                    ))
-
-                                }
+                                <p>{o.content}</p>
 
                             </div>
+                        ))}
 
-                        )
-
-                        :
-
-                        (
-
-                            <p className={styles.empty}>
-
-                                No observations
-
-                            </p>
-
-                        )
-
-                }
+                    </div>
+                ) : (
+                    <p className={styles.empty}>
+                        No observations
+                    </p>
+                )}
 
             </div>
 
         </div>
-
     );
-
 }

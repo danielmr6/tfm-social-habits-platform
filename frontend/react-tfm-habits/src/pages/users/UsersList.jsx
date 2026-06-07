@@ -10,11 +10,11 @@ export default function UsersList() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        loadUsers();
+        loadUsers("");
     }, []);
 
-    async function loadUsers() {
-        const data = await getUsers(search, 0, 10);
+    async function loadUsers(currentSearch = search) {
+        const data = await getUsers(currentSearch, 0, 10);
         setUsers(data.content);
     }
 
@@ -26,7 +26,13 @@ export default function UsersList() {
 
     return (
         <div className={styles.container}>
-            <h1>Users list</h1>
+            <h1 className={styles.title}>
+                Summary of my users
+            </h1>
+
+            <p className={styles.subtitle}>
+                Overview of activity, status and habit compliance
+            </p>
 
             {/* SEARCH */}
             <div className={styles.searchWrapper}>
@@ -38,7 +44,10 @@ export default function UsersList() {
                         onChange={(e) => setSearch(e.target.value)}
                     />
 
-                    <button className={styles.button} onClick={loadUsers}>
+                    <button
+                        className={styles.button}
+                        onClick={() => loadUsers(search)}
+                    >
                         Search
                     </button>
                 </div>
@@ -76,13 +85,18 @@ export default function UsersList() {
 
                                 {/* STATUS */}
                                 <td className={styles.td}>
-                                    <span className={getStatusClass(user.habitStatus)}>
-                                        {user.habitStatus}
-                                    </span>
+                                        <span className={getStatusClass(user.habitStatus)}>
+                                            {user.habitStatus}
+                                        </span>
+                                    {user.hasRiskyHabitsToday && (
+                                        <div className={styles.alert}>
+                                            ⚠ Negative habits today
+                                        </div>
+                                    )}
 
                                     {user.hasMissingTodayHabits && (
                                         <div className={styles.alert}>
-                                            ⚠ Today incomplete
+                                            ❌ Today incomplete
                                         </div>
                                     )}
                                 </td>

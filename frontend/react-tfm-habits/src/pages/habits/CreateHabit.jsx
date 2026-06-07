@@ -34,7 +34,13 @@ export default function CreateHabit(){
         setSuccess("");
 
         try {
-            await createHabit(id, habit);
+
+            const habitToSend = {
+                ...habit,
+                date: habit.date || new Date().toISOString().split("T")[0]
+            };
+
+            await createHabit(id, habitToSend);
 
             setSuccess("Habit created successfully");
 
@@ -48,6 +54,7 @@ export default function CreateHabit(){
                 description: "",
                 date: ""
             });
+
         } catch (err) {
             setError("Error creating habit");
         }

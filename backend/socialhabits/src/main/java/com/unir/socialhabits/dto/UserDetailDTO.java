@@ -29,5 +29,7 @@ public class UserDetailDTO {
 
     private boolean hasMissingTodayHabits;
 
+    private boolean hasRiskyHabitsToday;
+
     private long missingDaysCount;
 }

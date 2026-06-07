@@ -7,6 +7,7 @@ import com.unir.socialhabits.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Service
@@ -27,12 +28,12 @@ public class HabitService {
                 .type(dto.getType())
                 .status(dto.getStatus())
                 .description(dto.getDescription())
-                .date(dto.getDate())
+                .date(dto.getDate() != null ? dto.getDate() : LocalDate.now())
                 .build();
 
         Habit saved = habitRepository.save(habit);
 
-        userService.refreshUserHabitStatus(user);
+        userService.updateUserStatus(user);
 
         return mapToDTO(saved);
     }
@@ -45,8 +46,8 @@ public class HabitService {
         User user = habit.getUser();
 
         habitRepository.delete(habit);
-        
-        userService.refreshUserHabitStatus(user);
+
+        userService.updateUserStatus(user);
     }
 
     private HabitDTO mapToDTO(Habit habit) {

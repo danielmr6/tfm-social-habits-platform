@@ -224,6 +224,8 @@ public class UserService {
         dto.setAge(user.getAge());
         dto.setGeneralObservations(user.getGeneralObservations());
         dto.setHabitStatus(calculateStatus(user));
+        dto.setHasRiskyHabitsToday(hasRiskyHabitsToday(user));
+
         dto.setHasMissingTodayHabits(
                 habitRepository
                         .findByUserIdAndDate(user.getId(), LocalDate.now())
@@ -287,6 +289,8 @@ public class UserService {
 
         dto.setHabitStatus(calculateStatus(user));
 
+        dto.setHasRiskyHabitsToday(hasRiskyHabitsToday(user));
+
         dto.setHasMissingTodayHabits(
                 habitRepository
                         .findByUserIdAndDate(user.getId(), LocalDate.now())
@@ -312,27 +316,28 @@ public class UserService {
 
     public HabitGlobalStatus calculateStatus(User user) {
 
-        LocalDate today = LocalDate.now();
-
         List<Habit> habitsToday =
-                habitRepository.findByUserIdAndDate(user.getId(), today);
+                habitRepository.findByUserIdAndDate(user.getId(), LocalDate.now());
 
         if (habitsToday.isEmpty()) {
             return HabitGlobalStatus.CRITICAL;
         }
 
-        boolean hasNegative =
+        boolean hasRisk =
                 habitsToday.stream()
-                        .anyMatch(h -> h.getStatus() == HabitStatus.NEGATIVE);
+                        .anyMatch(h -> h.getStatus() != HabitStatus.CORRECT);
 
-        if (hasNegative) {
-            return HabitGlobalStatus.WARNING;
-        }
-
-        return HabitGlobalStatus.OK;
+        return hasRisk ? HabitGlobalStatus.WARNING : HabitGlobalStatus.OK;
     }
 
-    public void refreshUserHabitStatus(User user) {
+    public void updateUserStatus(User user) {
         userRepository.save(user);
+    }
+
+    private boolean hasRiskyHabitsToday(User user) {
+        return user.getHabits()
+                .stream()
+                .filter(h -> LocalDate.now().equals(h.getDate()))
+                .anyMatch(h -> h.getStatus() != HabitStatus.CORRECT);
     }
 }

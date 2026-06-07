@@ -6,7 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface ObservationRepository extends JpaRepository<Observation, UUID> {
+public interface ObservationRepository
+        extends JpaRepository<Observation, UUID> {
 
-    List<Observation> findByUserId(UUID userId);
+    List<Observation> findByUserIdOrderByCreatedAtDesc(
+            UUID userId
+    );
+
 }
