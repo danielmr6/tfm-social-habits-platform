@@ -12,15 +12,17 @@ import org.springframework.stereotype.Service;
 
 import com.unir.socialhabits.dto.*;
 import com.unir.socialhabits.entities.*;
-
-import com.unir.socialhabits.repositories.UserRepository;
-import com.unir.socialhabits.repositories.ProfessionalRepository;
+import com.unir.socialhabits.repositories.*;
 
 import java.util.UUID;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
+    private final HabitRepository habitRepository;
 
     private final UserRepository userRepository;
 
@@ -220,6 +222,13 @@ public class UserService {
         dto.setFirstName(user.getFirstName());
         dto.setLastName(user.getLastName());
         dto.setAge(user.getAge());
+        dto.setGeneralObservations(user.getGeneralObservations());
+        dto.setHabitStatus(calculateStatus(user));
+        dto.setHasMissingTodayHabits(
+                habitRepository
+                        .findByUserIdAndDate(user.getId(), LocalDate.now())
+                        .isEmpty()
+        );
 
         dto.setHabits(
                 user.getHabits().stream().map(h -> {
@@ -276,6 +285,14 @@ public class UserService {
                 user.getPhoneNumber()
         );
 
+        dto.setHabitStatus(calculateStatus(user));
+
+        dto.setHasMissingTodayHabits(
+                habitRepository
+                        .findByUserIdAndDate(user.getId(), LocalDate.now())
+                        .isEmpty()
+        );
+
         return dto;
     }
 
@@ -287,7 +304,35 @@ public class UserService {
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setAge(dto.getAge());
+        user.setGeneralObservations(dto.getGeneralObservations());
+        user.setPhoneNumber(dto.getPhoneNumber());
 
+        userRepository.save(user);
+    }
+
+    public HabitGlobalStatus calculateStatus(User user) {
+
+        LocalDate today = LocalDate.now();
+
+        List<Habit> habitsToday =
+                habitRepository.findByUserIdAndDate(user.getId(), today);
+
+        if (habitsToday.isEmpty()) {
+            return HabitGlobalStatus.CRITICAL;
+        }
+
+        boolean hasNegative =
+                habitsToday.stream()
+                        .anyMatch(h -> h.getStatus() == HabitStatus.NEGATIVE);
+
+        if (hasNegative) {
+            return HabitGlobalStatus.WARNING;
+        }
+
+        return HabitGlobalStatus.OK;
+    }
+
+    public void refreshUserHabitStatus(User user) {
         userRepository.save(user);
     }
 }

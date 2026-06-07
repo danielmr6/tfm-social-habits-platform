@@ -1,5 +1,6 @@
 package com.unir.socialhabits.dto;
 
+import com.unir.socialhabits.entities.HabitGlobalStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,4 +23,7 @@ public class UserDTO {
 
     private String phoneNumber;
 
+    private HabitGlobalStatus habitStatus;
+
+    private boolean hasMissingTodayHabits;
 }

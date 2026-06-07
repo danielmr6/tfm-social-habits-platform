@@ -35,7 +35,7 @@ public class User {
     @JsonBackReference
     private Professional professional;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Habit> habits;
 

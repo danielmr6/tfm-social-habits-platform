@@ -1,5 +1,6 @@
 package com.unir.socialhabits.controllers;
 
+import com.unir.socialhabits.dto.*;
 import com.unir.socialhabits.entities.Habit;
 import com.unir.socialhabits.services.HabitService;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,16 @@ public class HabitController {
     private final HabitService habitService;
 
     @PostMapping("/{userId}")
-    public Habit createHabit(
+    public HabitDTO createHabit(
             @PathVariable UUID userId,
-            @RequestBody Habit habit
-    ) {
-        return habitService.createHabit(userId, habit);
+            @RequestBody HabitDTO dto
+    ){
+
+        return habitService.createHabit(
+                userId,
+                dto
+        );
+
     }
 
     @DeleteMapping("/{id}")

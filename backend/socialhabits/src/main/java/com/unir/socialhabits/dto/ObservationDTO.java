@@ -16,5 +16,5 @@ public class ObservationDTO {
 
     private LocalDateTime createdAt;
 
-    private String professionalName; 
+    private String professionalName;
 }

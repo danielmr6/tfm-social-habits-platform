@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -28,11 +30,9 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<Void> forgotPassword(
-            @RequestParam String email
-    ) {
+    public ResponseEntity<Void> forgotPassword(@RequestBody Map<String, String> body) {
 
-        authService.sendPasswordReset(email);
+        authService.sendPasswordReset(body.get("email"));
 
         return ResponseEntity.ok().build();
     }

@@ -8,11 +8,15 @@ import com.unir.socialhabits.entities.PasswordResetToken;
 import com.unir.socialhabits.repositories.ProfessionalRepository;
 import com.unir.socialhabits.repositories.PasswordResetTokenRepository;
 import com.unir.socialhabits.security.JwtService;
+import com.unir.socialhabits.services.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +28,8 @@ public class AuthService {
     private final PasswordResetTokenRepository tokenRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final EmailService emailService;
 
     public LoginResponseDTO login(LoginRequestDTO request) {
 
@@ -46,17 +52,18 @@ public class AuthService {
         return new LoginResponseDTO(token);
     }
 
-    /**
-     * Generates password recovery token.
-     */
-    public void sendPasswordReset(
-            String email
-    ){
+    public void sendPasswordReset(String email){
 
         Professional professional =
                 professionalRepository
                         .findByEmail(email)
-                        .orElseThrow();
+                        .orElseThrow(
+                                () ->
+                                        new ResponseStatusException(
+                                                HttpStatus.NOT_FOUND,
+                                                "Email not registered"
+                                        )
+                        );
 
         String token =
                 UUID.randomUUID().toString();
@@ -77,6 +84,13 @@ public class AuthService {
 
         tokenRepository.save(resetToken);
 
+        String link = "http://localhost:3000/reset-password?token=" + token;
+
+        emailService.send(
+                email,
+                "Password recovery",
+                "Click here to reset your password:\n" + link
+        );
     }
 
     /**
@@ -88,9 +102,20 @@ public class AuthService {
     ){
 
         PasswordResetToken resetToken =
-                tokenRepository
-                        .findByToken(token)
-                        .orElseThrow();
+                tokenRepository.findByToken(token)
+                        .orElseThrow(() ->
+                                new ResponseStatusException(
+                                        HttpStatus.BAD_REQUEST,
+                                        "Invalid token"
+                                )
+                        );
+
+        if (resetToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Token expired"
+            );
+        }
 
         Professional professional =
                 professionalRepository

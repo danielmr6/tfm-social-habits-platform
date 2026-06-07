@@ -1,5 +1,6 @@
 package com.unir.socialhabits.dto;
 
+import com.unir.socialhabits.entities.HabitGlobalStatus;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,15 @@ public class UserDetailDTO {
 
     private Integer age;
 
+    private String generalObservations;
+
     private List<HabitDTO> habits;
 
     private List<ObservationDTO> observations;
+
+    private HabitGlobalStatus habitStatus;
+
+    private boolean hasMissingTodayHabits;
+
+    private long missingDaysCount;
 }

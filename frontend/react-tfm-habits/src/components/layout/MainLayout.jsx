@@ -34,21 +34,30 @@ export default function MainLayout() {
         <div className={styles.container}>
             <header className={styles.header}>
 
-                <div className={styles.brand}>
-                    Social<span>Habits</span>
-                </div>
-
-                <button
-                    onClick={logout}
-                    style={{
-                        padding: "8px 14px",
-                        cursor: "pointer"
-                    }}
+                <Link
+                    to="/users"
+                    className={styles.brand}
                 >
+                    Social<span>Habits</span>
+                </Link>
 
-                    Logout
+                <div className={styles.headerActions}>
 
-                </button>
+                    <button
+                        className={styles.headerBtn}
+                        onClick={() => navigate("/users")}
+                    >
+                        Home
+                    </button>
+
+                    <button
+                        className={styles.headerBtn}
+                        onClick={logout}
+                    >
+                        Logout
+                    </button>
+
+                </div>
 
             </header>
             <div className={styles.body}>

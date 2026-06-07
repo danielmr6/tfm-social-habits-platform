@@ -224,7 +224,21 @@ export default function Login() {
                 </button>
 
             </form>
+            <button
 
+                type="button"
+
+                onClick={() =>
+                    navigate("/forgot-password")
+                }
+
+                style={registerButton}
+
+            >
+
+                Forgot Password
+
+            </button>
         </div>
 
     );

@@ -15,7 +15,8 @@ export default function UserEdit() {
     const [form, setForm] = useState({
         firstName: "",
         lastName: "",
-        age: ""
+        age: "",
+        generalObservations: ""
     });
 
     const [loading, setLoading] = useState(true);
@@ -35,7 +36,8 @@ export default function UserEdit() {
             setForm({
                 firstName: data.firstName || "",
                 lastName: data.lastName || "",
-                age: data.age || ""
+                age: data.age || "",
+                generalObservations: data.generalObservations || ""
             });
 
         } catch (e) {
@@ -129,6 +131,14 @@ export default function UserEdit() {
                     onChange={handleChange}
                     placeholder="Age"
                     type="number"
+                />
+
+                <textarea
+                    name="generalObservations"
+                    value={form.generalObservations}
+                    onChange={handleChange}
+                    placeholder="General observations"
+                    className={styles.textarea}
                 />
 
                 <button
