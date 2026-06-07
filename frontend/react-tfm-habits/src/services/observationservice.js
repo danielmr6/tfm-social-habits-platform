@@ -3,7 +3,7 @@ import api from "./api";
 export async function createObservation(
     userId,
     content
-){
+) {
 
     const response =
         await api.post(
@@ -17,5 +17,15 @@ export async function createObservation(
         );
 
     return response.data;
+
+}
+
+export async function deleteObservation(
+    observationId
+) {
+
+    await api.delete(
+        `/observations/${observationId}`
+    );
 
 }

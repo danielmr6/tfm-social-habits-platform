@@ -10,18 +10,33 @@ import {
     deleteHabit
 } from "../../services/habitservice";
 
+import {
+    createObservation,
+    deleteObservation
+} from "../../services/observationservice";
+
 import styles from "./UserDetail.module.css";
 
 export default function UserDetail() {
 
-    const { id } = useParams();
     const navigate = useNavigate();
-
+    const { id } = useParams();
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+
     const [deleting, setDeleting] = useState(false);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [selectedHabit, setSelectedHabit] = useState(null);
+
+    const [showDeleteModal, setShowDeleteModal] =
+        useState(false);
+
+    const [selectedHabit, setSelectedHabit] =
+        useState(null);
+
+    const [selectedObservation, setSelectedObservation] =
+        useState(null);
+
+    const [observationText, setObservationText] =
+        useState("");
 
     useEffect(() => {
         loadUser();
@@ -30,17 +45,24 @@ export default function UserDetail() {
     async function loadUser() {
 
         try {
+
             setLoading(true);
 
-            const data = await getUserById(id);
+            const data =
+                await getUserById(id);
+
             setUser(data);
 
-        } catch (err) {
-            console.error(err);
+        } catch {
+
             setUser(null);
+
         } finally {
+
             setLoading(false);
+
         }
+
     }
 
     function getStatusClass(status) {
@@ -61,30 +83,93 @@ export default function UserDetail() {
         setShowDeleteModal(true);
     }
 
+    async function handleCreateObservation(){
+
+        if(!observationText.trim())
+            return;
+
+        try{
+
+            await createObservation(
+                id,
+                observationText
+            );
+
+            setObservationText("");
+
+            await loadUser();
+
+        }catch{
+
+            alert(
+                "Error creating observation"
+            );
+
+        }
+
+    }
+
+    function handleDeleteObservation(
+        observationId
+    ){
+
+        setSelectedHabit(null);
+
+        setSelectedObservation(
+            observationId
+        );
+
+        setShowDeleteModal(true);
+
+    }
+
     async function confirmDelete() {
 
         try {
+
             setDeleting(true);
 
-            if (selectedHabit) {
+            if(selectedHabit){
 
-                await deleteHabit(selectedHabit);
+                await deleteHabit(
+                    selectedHabit
+                );
+
                 await loadUser();
 
-            } else {
+            }else if(selectedObservation){
+
+                await deleteObservation(
+                    selectedObservation
+                );
+
+                await loadUser();
+
+            }else{
 
                 await deleteUser(id);
+
                 navigate("/users");
 
             }
 
-        } catch (err) {
+        } catch(err){
+
             console.error(err);
-            alert("Delete failed");
+
+            alert(
+                "Delete failed"
+            );
+
         } finally {
+
             setDeleting(false);
+
             setShowDeleteModal(false);
+
             setSelectedHabit(null);
+
+            setSelectedObservation(null);
         }
     }
 
@@ -118,29 +203,59 @@ export default function UserDetail() {
                     <div className={styles.confirmCard}>
 
                         <h2>
-                            {selectedHabit ? "Delete Habit" : "Delete User"}
+                            {
+                                selectedHabit
+                                    ? "Delete Habit"
+                                    : selectedObservation
+                                        ? "Delete Observation"
+                                        : "Delete User"
+                            }
                         </h2>
 
                         <p>
-                            {selectedHabit ? (
-                                "Are you sure you want to delete this habit?"
-                            ) : (
-                                <>
-                                    Are you sure you want to delete{" "}
-                                    <strong>
-                                        {user.firstName} {user.lastName}
-                                    </strong>
-                                    ?
-                                </>
-                            )}
+                            {
+                                selectedHabit
+                                    ? (
+                                        "Are you sure you want to delete this habit?"
+                                    )
+
+                                    : selectedObservation
+
+                                        ? (
+                                            "Are you sure you want to delete this observation?"
+                                        )
+
+                                        : (
+
+                                            <>
+                                                Are you sure you want to delete{" "}
+                                                <strong>
+
+                                                    {user.firstName}
+                                                    {" "}
+                                                    {user.lastName}
+
+                                                </strong>
+
+                                                ?
+
+                                            </>
+
+                                        )
+                            }
                         </p>
 
                         <div className={styles.modalActions}>
 
                             <button
                                 onClick={() => {
+
                                     setShowDeleteModal(false);
+
                                     setSelectedHabit(null);
+
+                                    setSelectedObservation(null);
+
                                 }}
                                 className={styles.cancelBtn}
                             >
@@ -300,32 +415,94 @@ export default function UserDetail() {
 
                 <h3>Observations</h3>
 
+                <div className={styles.observationForm}>
+
+                    <textarea
+                        value={observationText}
+                        placeholder="Add observation..."
+                        onChange={(e) =>
+                            setObservationText(
+                                e.target.value
+                            )
+                        }
+                    />
+
+                    <button
+                        className={styles.addObservationBtn}
+                        onClick={handleCreateObservation}
+                    >
+                        Add Observation
+                    </button>
+
+                </div>
+
                 {user.observations?.length > 0 ? (
+
                     <div className={styles.timeline}>
 
-                        {user.observations.map((o) => (
-                            <div key={o.id} className={styles.obsItem}>
+                        {user.observations.map(o=>(
+
+                            <div
+                                key={o.id}
+                                className={styles.obsItem}
+                            >
 
                                 <div className={styles.obsHeader}>
-                                    <span>{o.professionalName}</span>
+
+                                    <span>
+
+                                        {
+                                            o.professionalName
+                                        }
+
+                                    </span>
 
                                     <small>
-                                        {o.createdAt
-                                            ? new Date(o.createdAt).toLocaleDateString()
-                                            : "-"}
+
+                                        {
+                                            new Date(
+                                                o.createdAt
+                                            ).toLocaleDateString()
+                                        }
+
                                     </small>
+
                                 </div>
 
-                                <p>{o.content}</p>
+                                <p>
+
+                                    {o.content}
+
+                                </p>
+
+                                <button
+
+                                    className={styles.deleteObservationBtn}
+
+                                    onClick={() => handleDeleteObservation(
+                                        o.id
+                                    )}
+
+                                >
+
+                                    Remove Observation
+
+                                </button>
 
                             </div>
+
                         ))}
 
                     </div>
+
                 ) : (
-                    <p className={styles.empty}>
+
+                    <p>
+
                         No observations
+
                     </p>
+
                 )}
 
             </div>
