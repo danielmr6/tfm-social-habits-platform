@@ -32,6 +32,8 @@ public class AuthController {
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@RequestBody Map<String, String> body) {
 
+        System.out.println("FORGOT PASSWORD HIT");
+        System.out.println("EMAIL = " + body.get("email"));
         authService.sendPasswordReset(body.get("email"));
 
         return ResponseEntity.ok().build();

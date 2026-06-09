@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 
 import {
     getUserById,
-    deleteUser
+    deleteUser,
+    downloadUserReport
 } from "../../services/usersService";
 
 import {
@@ -41,6 +42,36 @@ export default function UserDetail() {
     useEffect(() => {
         loadUser();
     }, [id]);
+
+    async function handleDownloadReport() {
+
+        try {
+
+            const blob = await downloadUserReport(id);
+
+            // IMPORTANT: verify it's really a PDF
+            const url = window.URL.createObjectURL(
+                new Blob([blob], { type: "application/pdf" })
+            );
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `user-report-${id}.pdf`;
+
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+
+            window.URL.revokeObjectURL(url);
+
+        } catch (err) {
+
+            console.error(err);
+
+            alert("Error generating report");
+
+        }
+    }
 
     async function loadUser() {
 
@@ -196,7 +227,19 @@ export default function UserDetail() {
 
     return (
         <div className={styles.container}>
+            <button
 
+                className={styles.editBtn}
+
+                onClick={
+                    handleDownloadReport
+                }
+
+            >
+
+                Generate Report
+
+            </button>
             {/* MODAL */}
             {showDeleteModal && (
                 <div className={styles.modalOverlay}>

@@ -25,7 +25,7 @@ public class UserDTO {
 
     private HabitGlobalStatus habitStatus;
 
-    private boolean hasMissingTodayHabits;
+    private boolean missingTodayHabits;
 
-    private boolean hasRiskyHabitsToday;
+    private boolean riskyHabitsToday;
 }

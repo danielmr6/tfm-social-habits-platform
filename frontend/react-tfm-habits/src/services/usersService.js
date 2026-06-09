@@ -54,3 +54,22 @@ export async function updateUser(
 
     return response.data;
 }
+
+export async function downloadUserReport(userId) {
+
+    const response = await fetch(
+        `/api/reports/user/${userId}`,
+        {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`
+            }
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error("Failed to generate report");
+    }
+
+    return await response.blob();
+}

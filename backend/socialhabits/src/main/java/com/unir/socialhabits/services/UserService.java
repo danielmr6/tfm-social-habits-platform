@@ -224,9 +224,9 @@ public class UserService {
         dto.setAge(user.getAge());
         dto.setGeneralObservations(user.getGeneralObservations());
         dto.setHabitStatus(calculateStatus(user));
-        dto.setHasRiskyHabitsToday(hasRiskyHabitsToday(user));
+        dto.setRiskyHabitsToday(hasRiskyHabitsToday(user));
 
-        dto.setHasMissingTodayHabits(
+        dto.setMissingTodayHabits(
                 habitRepository
                         .findByUserIdAndDate(user.getId(), LocalDate.now())
                         .isEmpty()
@@ -289,9 +289,9 @@ public class UserService {
 
         dto.setHabitStatus(calculateStatus(user));
 
-        dto.setHasRiskyHabitsToday(hasRiskyHabitsToday(user));
+        dto.setRiskyHabitsToday(hasRiskyHabitsToday(user));
 
-        dto.setHasMissingTodayHabits(
+        dto.setMissingTodayHabits(
                 habitRepository
                         .findByUserIdAndDate(user.getId(), LocalDate.now())
                         .isEmpty()

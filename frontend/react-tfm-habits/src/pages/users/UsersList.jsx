@@ -88,13 +88,13 @@ export default function UsersList() {
                                         <span className={getStatusClass(user.habitStatus)}>
                                             {user.habitStatus}
                                         </span>
-                                    {user.hasRiskyHabitsToday && (
+                                    {user.riskyHabitsToday && (
                                         <div className={styles.alert}>
                                             ⚠ Negative habits today
                                         </div>
                                     )}
 
-                                    {user.hasMissingTodayHabits && (
+                                    {user.missingTodayHabits && (
                                         <div className={styles.alert}>
                                             ❌ Today incomplete
                                         </div>

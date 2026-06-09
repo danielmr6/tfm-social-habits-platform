@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../../services/api";
 
 export default function ForgotPassword() {
@@ -6,6 +7,7 @@ export default function ForgotPassword() {
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
+    const navigate = useNavigate();
 
     async function handleSubmit(e) {
 
@@ -21,6 +23,10 @@ export default function ForgotPassword() {
             });
 
             setMessage("Recovery email sent successfully");
+
+            setTimeout(() => {
+                navigate("/login");
+            }, 3000);
 
         } catch (err) {
 

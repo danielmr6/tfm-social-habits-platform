@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 
@@ -52,6 +53,7 @@ public class AuthService {
         return new LoginResponseDTO(token);
     }
 
+    @Transactional
     public void sendPasswordReset(String email){
 
         Professional professional =
@@ -96,6 +98,7 @@ public class AuthService {
     /**
      * Updates encrypted password.
      */
+    @Transactional
     public void resetPassword(
             String token,
             String newPassword
