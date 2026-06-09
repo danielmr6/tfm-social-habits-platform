@@ -3,6 +3,7 @@ package com.unir.socialhabits.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -36,6 +37,11 @@ public class Professional {
 
     @OneToMany(mappedBy="professional")
     @JsonManagedReference
-    private List<User> users;
+    @Builder.Default
+    private List<User> users = new ArrayList<>();
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private Role role = Role.USER;
 
 }

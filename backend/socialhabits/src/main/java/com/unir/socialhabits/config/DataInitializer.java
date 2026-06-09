@@ -1,6 +1,7 @@
 package com.unir.socialhabits.config;
 
 import com.unir.socialhabits.entities.Professional;
+import com.unir.socialhabits.entities.Role;
 import com.unir.socialhabits.repositories.ProfessionalRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -23,6 +24,7 @@ public class DataInitializer implements CommandLineRunner {
                     .name("Admin")
                     .email("admin@test.com")
                     .password(passwordEncoder.encode("1234"))
+                    .role(Role.ADMIN)
                     .build();
 
             professionalRepository.save(professional);

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.Map;
 
 @RestController
@@ -21,7 +22,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(
-            @RequestBody LoginRequestDTO request
+            @Valid @RequestBody LoginRequestDTO request
     ) {
 
         return ResponseEntity.ok(
@@ -56,7 +57,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Void> register(
 
-            @RequestBody
+            @Valid @RequestBody
             RegisterProfessionalDTO dto
 
     ){

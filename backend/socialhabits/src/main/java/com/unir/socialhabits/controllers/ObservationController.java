@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -22,7 +23,7 @@ public class ObservationController {
 
             @PathVariable UUID userId,
 
-            @RequestBody CreateObservationDTO dto
+            @Valid @RequestBody CreateObservationDTO dto
 
     ){
 

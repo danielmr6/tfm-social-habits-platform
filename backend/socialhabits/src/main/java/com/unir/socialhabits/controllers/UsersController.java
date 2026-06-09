@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.UUID;
 
 @RestController
@@ -23,7 +24,7 @@ public class UsersController {
 
     @PostMapping
     public ResponseEntity<UserDTO> createUser(
-            @RequestBody CreateUserDTO dto
+            @Valid @RequestBody CreateUserDTO dto
     ) {
 
         return ResponseEntity.ok(
@@ -39,7 +40,7 @@ public class UsersController {
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateUser(
             @PathVariable UUID id,
-            @RequestBody UpdateUserDTO dto
+            @Valid @RequestBody UpdateUserDTO dto
     ) {
         userService.update(id, dto);
         return ResponseEntity.ok().build();
