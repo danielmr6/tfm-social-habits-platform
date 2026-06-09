@@ -9,6 +9,8 @@ import com.unir.socialhabits.dto. HabitDTO;
 import com.unir.socialhabits.entities.User;
 import com.unir.socialhabits.repositories.UserRepository;
 
+import com.lowagie.text.pdf.PdfPTable;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,131 +27,396 @@ public class ReportService {
     private final UserService userService;
 
     public byte[] generateUserReport(UUID userId) {
-        System.out.println("PDF START");
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
-        UserDetailDTO dto = userService.toDetailDTO(user);
+        UserDetailDTO dto =
+                userService.toDetailDTO(user);
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ByteArrayOutputStream out =
+                new ByteArrayOutputStream();
 
-        Document document = new Document();
+        Document document =
+                new Document(PageSize.A4);
 
         try {
-            PdfWriter.getInstance(document, out);
+
+            PdfWriter.getInstance(
+                    document,
+                    out
+            );
+
             document.open();
 
-            // ========================
-            // TITLE
-            // ========================
-            Font titleFont = new Font(Font.HELVETICA, 18, Font.BOLD);
-            document.add(new Paragraph("USER REPORT", titleFont));
-            document.add(new Paragraph("Generated on: " + LocalDate.now()));
-            document.add(new Paragraph(" "));
+            Font titleFont =
+                    new Font(
+                            Font.HELVETICA,
+                            20,
+                            Font.BOLD
+                    );
 
-            // ========================
-            // USER INFO
-            // ========================
-            Font sectionFont = new Font(Font.HELVETICA, 14, Font.BOLD);
+            Font sectionFont =
+                    new Font(
+                            Font.HELVETICA,
+                            14,
+                            Font.BOLD
+                    );
 
-            document.add(new Paragraph("USER INFORMATION", sectionFont));
+            Font normalFont =
+                    new Font(
+                            Font.HELVETICA,
+                            11
+                    );
 
-            document.add(new Paragraph("Name: " + dto.getFirstName() + " " + dto.getLastName()));
-            document.add(new Paragraph("Age: " + dto.getAge()));
+            // ==================================
+            // HEADER
+            // ==================================
 
-            document.add(new Paragraph(
-                    "General Notes: " +
-                            (dto.getGeneralObservations() != null ? dto.getGeneralObservations() : "-")
-            ));
+            Paragraph title =
+                    new Paragraph(
+                            "USER EVOLUTION REPORT",
+                            titleFont
+                    );
 
-            document.add(new Paragraph(" "));
+            title.setAlignment(
+                    Element.ALIGN_CENTER
+            );
 
-            // ========================
+            document.add(title);
+
+            Paragraph date =
+                    new Paragraph(
+                            "Generated on " +
+                                    LocalDate.now()
+                    );
+
+            date.setAlignment(
+                    Element.ALIGN_CENTER
+            );
+
+            document.add(date);
+
+            document.add(
+                    new Paragraph(" ")
+            );
+
+            // ==================================
+            // USER INFORMATION
+            // ==================================
+
+            document.add(
+                    new Paragraph(
+                            "USER INFORMATION",
+                            sectionFont
+                    )
+            );
+
+            PdfPTable userTable =
+                    new PdfPTable(2);
+
+            userTable.setWidthPercentage(100);
+
+            userTable.addCell("Name");
+
+            userTable.addCell(
+                    dto.getFirstName() +
+                            " " +
+                            dto.getLastName()
+            );
+
+            userTable.addCell("Age");
+
+            userTable.addCell(
+                    String.valueOf(
+                            dto.getAge()
+                    )
+            );
+
+            userTable.addCell(
+                    "General Notes"
+            );
+
+            userTable.addCell(
+                    dto.getGeneralObservations() != null
+                            ? dto.getGeneralObservations()
+                            : "-"
+            );
+
+            document.add(userTable);
+
+            document.add(
+                    new Paragraph(" ")
+            );
+
+            // ==================================
             // EVOLUTION SUMMARY
-            // ========================
-            document.add(new Paragraph("EVOLUTION SUMMARY", sectionFont));
+            // ==================================
 
-            document.add(new Paragraph("Global Status: " + dto.getHabitStatus()));
-            document.add(new Paragraph("Risky habits today: " + dto.isRiskyHabitsToday()));
-            document.add(new Paragraph("Missing habits today: " + dto.isMissingTodayHabits()));
+            document.add(
+                    new Paragraph(
+                            "EVOLUTION SUMMARY",
+                            sectionFont
+                    )
+            );
 
-            document.add(new Paragraph(" "));
+            PdfPTable summaryTable =
+                    new PdfPTable(2);
 
-            // ========================
+            summaryTable.setWidthPercentage(
+                    100
+            );
+
+            summaryTable.addCell(
+                    "Global Status"
+            );
+
+            summaryTable.addCell(
+                    String.valueOf(
+                            dto.getHabitStatus()
+                    )
+            );
+
+            summaryTable.addCell(
+                    "Risky Habits Today"
+            );
+
+            summaryTable.addCell(
+                    dto.isRiskyHabitsToday()
+                            ? "YES"
+                            : "NO"
+            );
+
+            summaryTable.addCell(
+                    "Missing Habits Today"
+            );
+
+            summaryTable.addCell(
+                    dto.isMissingTodayHabits()
+                            ? "YES"
+                            : "NO"
+            );
+
+            document.add(summaryTable);
+
+            document.add(
+                    new Paragraph(" ")
+            );
+
+            // ==================================
             // HABITS
-            // ========================
-            document.add(new Paragraph("HABITS", sectionFont));
+            // ==================================
 
-            if (dto.getHabits() == null || dto.getHabits().isEmpty()) {
-                document.add(new Paragraph("No habits registered"));
+            document.add(
+                    new Paragraph(
+                            "HABITS",
+                            sectionFont
+                    )
+            );
+
+            PdfPTable habitsTable =
+                    new PdfPTable(4);
+
+            habitsTable.setWidthPercentage(
+                    100
+            );
+
+            habitsTable.addCell("Type");
+            habitsTable.addCell("Status");
+            habitsTable.addCell("Date");
+            habitsTable.addCell("Description");
+
+            if (
+                    dto.getHabits() != null
+                            &&
+                            !dto.getHabits().isEmpty()
+            ) {
+
+                for(HabitDTO h :
+                        dto.getHabits()) {
+
+                    habitsTable.addCell(
+                            String.valueOf(
+                                    h.getType()
+                            )
+                    );
+
+                    habitsTable.addCell(
+                            String.valueOf(
+                                    h.getStatus()
+                            )
+                    );
+
+                    habitsTable.addCell(
+                            h.getDate() != null
+                                    ? h.getDate().toString()
+                                    : "-"
+                    );
+
+                    habitsTable.addCell(
+                            h.getDescription() != null
+                                    ? h.getDescription()
+                                    : "-"
+                    );
+
+                }
+
             } else {
-                dto.getHabits().forEach(h -> {
-                    try {
-                        String type = h.getType() != null ? h.getType().toString() : "-";
-                        String status = h.getStatus() != null ? h.getStatus().toString() : "-";
-                        String date = h.getDate() != null ? h.getDate().toString() : "";
-                        String desc = h.getDescription() != null ? h.getDescription() : "";
 
-                        document.add(new Paragraph(
-                                "- " + type + " | " + status + " | " + date + " | " + desc
-                        ));
+                habitsTable.addCell(
+                        "No habits registered"
+                );
 
-                    } catch (Exception e) {
-                        System.out.println("Error rendering habit: " + e.getMessage());
-                    }
-                });
             }
 
-            document.add(new Paragraph(" "));
+            document.add(
+                    habitsTable
+            );
 
-            // ========================
+            document.add(
+                    new Paragraph(" ")
+            );
+
+            // ==================================
             // OBSERVATIONS
-            // ========================
-            document.add(new Paragraph("OBSERVATIONS", sectionFont));
+            // ==================================
 
-            if (dto.getObservations() == null || dto.getObservations().isEmpty()) {
-                document.add(new Paragraph("No observations"));
-            } else {
-                dto.getObservations().forEach(o -> {
-                    try {
-                        document.add(new Paragraph(
-                                "- " +
-                                        (o.getCreatedAt() != null ? o.getCreatedAt() : "") + " | " +
-                                        (o.getProfessionalName() != null ? o.getProfessionalName() : "") + " | " +
-                                        (o.getContent() != null ? o.getContent() : "")
-                        ));
-                    } catch (Exception e) {
-                        System.out.println("Error rendering observation: " + e.getMessage());
-                    }
-                });
+            document.add(
+                    new Paragraph(
+                            "OBSERVATIONS",
+                            sectionFont
+                    )
+            );
+
+            PdfPTable observationsTable =
+                    new PdfPTable(3);
+
+            observationsTable.setWidthPercentage(
+                    100
+            );
+
+            observationsTable.addCell(
+                    "Date"
+            );
+
+            observationsTable.addCell(
+                    "Professional"
+            );
+
+            observationsTable.addCell(
+                    "Observation"
+            );
+
+            if (
+                    dto.getObservations() != null
+                            &&
+                            !dto.getObservations().isEmpty()
+            ) {
+
+                dto.getObservations()
+                        .forEach(o -> {
+
+                            observationsTable.addCell(
+                                    o.getCreatedAt() != null
+                                            ? o.getCreatedAt()
+                                            .toLocalDate()
+                                            .toString()
+                                            : "-"
+                            );
+
+                            observationsTable.addCell(
+                                    o.getProfessionalName() != null
+                                            ? o.getProfessionalName()
+                                            : "-"
+                            );
+
+                            observationsTable.addCell(
+                                    o.getContent() != null
+                                            ? o.getContent()
+                                            : "-"
+                            );
+
+                        });
+
             }
 
-            // ========================
-            // COMPLETION RATE
-            // ========================
+            document.add(
+                    observationsTable
+            );
+
+            document.add(
+                    new Paragraph(" ")
+            );
+
+            // ==================================
+            // STATISTICS
+            // ==================================
+
             List<HabitDTO> habits =
-                    dto.getHabits() != null ? dto.getHabits() : List.of();
+                    dto.getHabits() != null
+                            ? dto.getHabits()
+                            : List.of();
 
-            long total = habits.size();
+            long total =
+                    habits.size();
 
-            long correct = habits.stream()
-                    .filter(h -> h.getStatus().name().equals("CORRECT"))
-                    .count();
+            long correct =
+                    habits.stream()
+                            .filter(h ->
+                                    h.getStatus()
+                                            .name()
+                                            .equals("CORRECT")
+                            )
+                            .count();
 
-            long completionRate = total == 0 ? 0 : (correct * 100 / total);
+            long completionRate =
+                    total == 0
+                            ? 0
+                            : (correct * 100 / total);
 
-            document.add(new Paragraph(" "));
-            document.add(new Paragraph("Completion rate: " + completionRate + "%"));
+            document.add(
+                    new Paragraph(
+                            "STATISTICS",
+                            sectionFont
+                    )
+            );
+
+            document.add(
+                    new Paragraph(
+                            "Total habits: " +
+                                    total,
+                            normalFont
+                    )
+            );
+
+            document.add(
+                    new Paragraph(
+                            "Completed habits: " +
+                                    correct,
+                            normalFont
+                    )
+            );
+
+            document.add(
+                    new Paragraph(
+                            "Completion rate: " +
+                                    completionRate +
+                                    "%",
+                            normalFont
+                    )
+            );
+
+            document.close();
+
+            return out.toByteArray();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error generating PDF report", e);
-        } finally {
-            if (document != null && document.isOpen()) {
-                document.close();
-            }
-        }
 
-        System.out.println("PDF SIZE = " + out.size());
-        return out.toByteArray();
+            throw new RuntimeException(
+                    "Error generating PDF report",
+                    e
+            );
+        }
     }
 }
