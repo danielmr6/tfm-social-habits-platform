@@ -34,10 +34,15 @@ public class AuthService {
 
     public LoginResponseDTO login(LoginRequestDTO request) {
 
-        Professional professional = professionalRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() ->
-                        new RuntimeException("User not found"));
+        Professional professional =
+                professionalRepository.findByEmail(request.getEmail())
+                        .orElseThrow(() ->
+                                new RuntimeException("Invalid credentials"));
+
+        if (professional.getLockUntil() != null &&
+                professional.getLockUntil().isAfter(LocalDateTime.now())) {
+            throw new RuntimeException("Account temporarily locked");
+        }
 
         boolean validPassword = passwordEncoder.matches(
                 request.getPassword(),
@@ -45,9 +50,24 @@ public class AuthService {
         );
 
         if (!validPassword) {
-            throw new RuntimeException("Incorrect password");
+            professional.setLoginAttempts(
+                    professional.getLoginAttempts() + 1
+            );
+
+            if (professional.getLoginAttempts() >= 5) {
+                professional.setLockUntil(
+                        LocalDateTime.now().plusMinutes(15)
+                );
+            }
+
+            professionalRepository.save(professional);
+
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
         }
 
+        professional.setLoginAttempts(0);
+        professional.setLockUntil(null);
+        professionalRepository.save(professional);
         String token = jwtService.generateToken(professional.getEmail());
 
         return new LoginResponseDTO(token);
@@ -63,7 +83,7 @@ public class AuthService {
                                 () ->
                                         new ResponseStatusException(
                                                 HttpStatus.NOT_FOUND,
-                                                "Email not registered"
+                                                "Invalid request"
                                         )
                         );
 
@@ -99,10 +119,7 @@ public class AuthService {
      * Updates encrypted password.
      */
     @Transactional
-    public void resetPassword(
-            String token,
-            String newPassword
-    ){
+    public void resetPassword(String token, String newPassword) {
 
         PasswordResetToken resetToken =
                 tokenRepository.findByToken(token)
@@ -121,26 +138,16 @@ public class AuthService {
         }
 
         Professional professional =
-                professionalRepository
-                        .findByEmail(
-                                resetToken.getEmail()
-                        )
+                professionalRepository.findByEmail(resetToken.getEmail())
                         .orElseThrow();
 
         professional.setPassword(
-                passwordEncoder.encode(
-                        newPassword
-                )
+                passwordEncoder.encode(newPassword)
         );
 
-        professionalRepository.save(
-                professional
-        );
+        professionalRepository.save(professional);
 
-        tokenRepository.delete(
-                resetToken
-        );
-
+        tokenRepository.delete(resetToken);
     }
 
     public void register(

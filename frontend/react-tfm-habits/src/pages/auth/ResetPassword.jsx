@@ -1,75 +1,110 @@
-import { useSearchParams } from "react-router-dom";
-
 import { useState } from "react";
-
+import { useNavigate, useSearchParams } from "react-router-dom";
 import api from "../../services/api";
 
-export default function ResetPassword(){
+export default function ResetPassword() {
 
-    const [params]=useSearchParams();
+    const [searchParams] = useSearchParams();
+    const token = searchParams.get("token");
 
-    const token =
-        params.get("token");
+    const navigate = useNavigate();
 
-    const [password,setPassword]=
-        useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
 
-    async function submit(e){
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+
+    function validate() {
+
+        if (!password) return "Password is required";
+
+        if (password.length < 8 || password.length > 50)
+            return "Password must be between 8 and 50 characters";
+
+        if (password !== confirmPassword)
+            return "Passwords do not match";
+
+        return null;
+    }
+
+    async function handleSubmit(e) {
 
         e.preventDefault();
 
-        await api.post(
+        setMessage("");
+        setError("");
 
-            "/auth/reset-password",
+        const validationError = validate();
 
-            null,
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
 
-            {
+        try {
 
-                params:{
+            await api.post("/auth/reset-password", {
+                token,
+                newPassword: password
+            });
 
-                    token,
+            setMessage("Password updated successfully");
 
-                    newPassword:password
+            setTimeout(() => {
+                navigate("/login");
+            }, 2000);
 
-                }
+        } catch (err) {
 
-            }
+            const backendMessage =
+                err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Error resetting password";
 
-        );
-
-        alert(
-            "Password updated"
-        );
-
+            setError(backendMessage);
+        }
     }
 
-    return(
+    return (
+        <div style={{ maxWidth: "400px", margin: "40px auto" }}>
 
-        <form onSubmit={submit}>
+            <h1>Reset Password</h1>
 
-            <input
+            <form
+                onSubmit={handleSubmit}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px"
+                }}
+            >
 
-                type="password"
+                <input
+                    type="password"
+                    placeholder="New password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{ padding: "8px" }}
+                />
 
-                value={password}
+                <input
+                    type="password"
+                    placeholder="Confirm password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    style={{ padding: "8px" }}
+                />
 
-                onChange={
-                    e=>setPassword(
-                        e.target.value
-                    )
-                }
+                <button type="submit">
+                    Reset password
+                </button>
 
-            />
+            </form>
 
-            <button>
+            {message && <p style={{ color: "green" }}>{message}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
-                Change Password
-
-            </button>
-
-        </form>
-
+        </div>
     );
-
 }

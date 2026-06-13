@@ -35,4 +35,11 @@ public class ObservationController {
 
     }
 
+    @DeleteMapping("/{observationId}")
+    public void deleteObservation(
+            @PathVariable UUID observationId
+    ) {
+        observationService.deleteObservation(observationId);
+    }
+
 }

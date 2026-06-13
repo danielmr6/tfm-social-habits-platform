@@ -29,11 +29,6 @@ export default function ForgotPassword() {
             }, 3000);
 
         } catch (err) {
-
-            console.log("FULL ERROR:", err);
-            console.log("STATUS:", err.response?.status);
-            console.log("DATA:", err.response?.data);
-
             const backendMessage =
                 err.response?.data?.message ||
                 err.response?.data?.error ||

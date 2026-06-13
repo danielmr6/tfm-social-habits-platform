@@ -37,12 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path =
                 request.getRequestURI();
 
-        System.out.println(
-                "PATH -> " + path
-        );
-
-        // Skip auth endpoints
-
         if (path.startsWith("/auth/")) {
 
             filterChain.doFilter(
@@ -57,10 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 request.getHeader(
                         "Authorization"
                 );
-
-        System.out.println(
-                "HEADER -> " + authHeader
-        );
 
         if (
                 authHeader == null ||
@@ -80,18 +70,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token =
                     authHeader.substring(7);
 
-            System.out.println(
-                    "TOKEN -> " + token
-            );
-
             String email =
                     jwtService.extractUsername(
                             token
                     );
-
-            System.out.println(
-                    "EMAIL -> " + email
-            );
 
             if (
                     email != null &&
@@ -107,11 +89,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 .loadUserByUsername(
                                         email
                                 );
-
-                System.out.println(
-                        "USER FOUND -> " +
-                                userDetails.getUsername()
-                );
 
                 if (
                         jwtService.isValid(
@@ -144,27 +121,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .getContext()
 
                             .setAuthentication(auth);
-
-                    System.out.println(
-                            "AUTHENTICATED"
-                    );
                 }
             }
 
         } catch (Exception e) {
-
-            System.out.println(
-                    "JWT ERROR -> " +
-                            e.getMessage()
-            );
+            System.out.println("JWT ERROR");
         }
-
-        System.out.println(
-                "SECURITY CONTEXT -> " +
-                        SecurityContextHolder
-                                .getContext()
-                                .getAuthentication()
-        );
 
         filterChain.doFilter(
                 request,

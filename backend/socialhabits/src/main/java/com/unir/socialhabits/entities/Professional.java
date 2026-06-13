@@ -3,6 +3,7 @@ package com.unir.socialhabits.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -43,5 +44,15 @@ public class Professional {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private Role role = Role.USER;
+
+    @Column(
+            name = "login_attempts",
+            nullable = false
+    )
+    @Builder.Default
+    private int loginAttempts = 0;
+
+    @Column(name = "lock_until")
+    private LocalDateTime lockUntil;
 
 }

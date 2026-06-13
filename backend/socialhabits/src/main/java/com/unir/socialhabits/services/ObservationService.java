@@ -94,4 +94,7 @@ public class ObservationService {
         return dto;
     }
 
+    public void deleteObservation(UUID id) {
+        observationRepository.deleteById(id);
+    }
 }

@@ -46,7 +46,7 @@ export default function UserCreate() {
         const phone = values.phoneNumber.trim();
 
         if (phone.length > 0) {
-            const regex = /^[0-9+ ]{6,20}$/;
+            const regex = /^[0-9+ ]{8,20}$/;
 
             if (!regex.test(phone)) {
                 newErrors.phoneNumber = "Invalid phone number format";

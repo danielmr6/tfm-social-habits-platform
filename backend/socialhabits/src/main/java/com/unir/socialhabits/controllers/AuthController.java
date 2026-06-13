@@ -1,8 +1,6 @@
 package com.unir.socialhabits.controllers;
 
-import com.unir.socialhabits.dto.LoginRequestDTO;
-import com.unir.socialhabits.dto.LoginResponseDTO;
-import com.unir.socialhabits.dto.RegisterProfessionalDTO;
+import com.unir.socialhabits.dto.*;
 import com.unir.socialhabits.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,9 +30,6 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     public ResponseEntity<Void> forgotPassword(@RequestBody Map<String, String> body) {
-
-        System.out.println("FORGOT PASSWORD HIT");
-        System.out.println("EMAIL = " + body.get("email"));
         authService.sendPasswordReset(body.get("email"));
 
         return ResponseEntity.ok().build();
@@ -42,13 +37,12 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     public ResponseEntity<Void> resetPassword(
-            @RequestParam String token,
-            @RequestParam String newPassword
+            @Valid @RequestBody ResetPasswordDTO dto
     ) {
 
         authService.resetPassword(
-                token,
-                newPassword
+                dto.getToken(),
+                dto.getNewPassword()
         );
 
         return ResponseEntity.ok().build();

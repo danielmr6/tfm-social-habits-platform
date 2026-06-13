@@ -22,8 +22,10 @@ export default function Login() {
 
         if (!password) {
             newErrors.password = "Password is required";
-        } else if (password.length < 4) {
-            newErrors.password = "Password must be at least 4 characters";
+        } else if (password.length < 8) {
+            newErrors.password = "Password must be at least 8 characters";
+        } else if (password.length > 50) {
+            newErrors.password = "Password must be less than 50 characters";
         }
 
         return newErrors;
@@ -123,15 +125,15 @@ export default function Login() {
                 >
                     Register Professional
                 </button>
-            </form>
 
-            <button
-                type="button"
-                onClick={() => navigate("/forgot-password")}
-                style={registerButton}
-            >
-                Forgot Password
-            </button>
+                <button
+                    type="button"
+                    onClick={() => navigate("/forgot-password")}
+                    style={registerButton}
+                >
+                    Forgot Password
+                </button>
+            </form>
         </div>
     );
 }

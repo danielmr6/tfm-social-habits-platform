@@ -20,7 +20,7 @@ public class CreateUserDTO {
     @Min(1)
     @Max(120)
     private Integer age;
-    
+
     @Pattern(
             regexp = "^[0-9+ ]{6,20}$",
             message = "Invalid phone number"
