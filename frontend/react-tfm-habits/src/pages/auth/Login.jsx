@@ -4,14 +4,17 @@ import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState({});
+    const [attemptsLeft, setAttemptsLeft] = useState(null);
 
     const { loginUser } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const validate = () => {
+
         const newErrors = {};
 
         if (!email.trim()) {
@@ -32,6 +35,7 @@ export default function Login() {
     };
 
     const handleSubmit = async (e) => {
+
         e.preventDefault();
 
         const validationErrors = validate();
@@ -42,14 +46,60 @@ export default function Login() {
         }
 
         setErrors({});
+        setAttemptsLeft(null);
 
         try {
+
             const data = await login(email, password);
+
             loginUser(data.token);
+
             navigate("/users");
+
         } catch (error) {
+
+            console.log(error.response);
+            console.log(error.response?.data);
+            console.log(error.response?.headers);
+
+            const status = error.response?.status;
+
+            const data = error.response?.data;
+
+            const message =
+                typeof data === "string"
+                    ? data
+                    : data?.message ||
+                    data?.error ||
+                    data?.detail ||
+                    "Login failed";
+
+            if (message.includes("Attempts left")) {
+
+                const match =
+                    message.match(/Attempts left:\s*(\d+)/);
+
+                if (match) {
+                    setAttemptsLeft(
+                        parseInt(match[1], 10)
+                    );
+                }
+            }
+
+            if (status === 423) {
+
+                setAttemptsLeft(0);
+
+                setErrors({
+                    general:
+                        "🔒 Account locked for 1 minute."
+                });
+
+                return;
+            }
+
             setErrors({
-                general: "Incorrect email or password"
+                general: message
             });
         }
     };
@@ -65,62 +115,109 @@ export default function Login() {
                 boxShadow: "0 2px 10px rgba(0,0,0,.1)"
             }}
         >
-            <h1 style={{ textAlign: "center", marginBottom: "10px" }}>
+            <h1
+                style={{
+                    textAlign: "center",
+                    marginBottom: "10px"
+                }}
+            >
                 SocialHabits
             </h1>
 
-            <p style={{ textAlign: "center", color: "#666", marginBottom: "30px" }}>
+            <p
+                style={{
+                    textAlign: "center",
+                    color: "#666",
+                    marginBottom: "30px"
+                }}
+            >
                 Sign in to continue
             </p>
 
             <form
                 onSubmit={handleSubmit}
-                style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "20px"
+                }}
             >
-                {/* EMAIL */}
                 <div>
                     <label>Email</label>
+
                     <input
                         type="email"
                         placeholder="Enter email"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) =>
+                            setEmail(e.target.value)
+                        }
                         style={inputStyle}
                     />
+
                     {errors.email && (
-                        <p style={errorStyle}>{errors.email}</p>
+                        <p style={errorStyle}>
+                            {errors.email}
+                        </p>
                     )}
                 </div>
 
-                {/* PASSWORD */}
                 <div>
                     <label>Password</label>
+
                     <input
                         type="password"
                         placeholder="Enter password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) =>
+                            setPassword(e.target.value)
+                        }
                         style={inputStyle}
                     />
+
                     {errors.password && (
-                        <p style={errorStyle}>{errors.password}</p>
+                        <p style={errorStyle}>
+                            {errors.password}
+                        </p>
                     )}
                 </div>
 
-                {/* GENERAL ERROR */}
                 {errors.general && (
-                    <p style={{ ...errorStyle, textAlign: "center" }}>
+                    <p
+                        style={{
+                            ...errorStyle,
+                            textAlign: "center"
+                        }}
+                    >
                         {errors.general}
                     </p>
                 )}
 
-                <button type="submit" style={loginButton}>
+                {attemptsLeft > 0 && (
+                    <p
+                        style={{
+                            color: "orange",
+                            textAlign: "center",
+                            fontSize: "14px",
+                            margin: 0
+                        }}
+                    >
+                        ⚠ Attempts remaining: {attemptsLeft}
+                    </p>
+                )}
+
+                <button
+                    type="submit"
+                    style={loginButton}
+                >
                     Login
                 </button>
 
                 <button
                     type="button"
-                    onClick={() => navigate("/register")}
+                    onClick={() =>
+                        navigate("/register")
+                    }
                     style={registerButton}
                 >
                     Register Professional
@@ -128,7 +225,9 @@ export default function Login() {
 
                 <button
                     type="button"
-                    onClick={() => navigate("/forgot-password")}
+                    onClick={() =>
+                        navigate("/forgot-password")
+                    }
                     style={registerButton}
                 >
                     Forgot Password
@@ -138,7 +237,6 @@ export default function Login() {
     );
 }
 
-/* STYLES */
 const inputStyle = {
     width: "100%",
     padding: "12px",

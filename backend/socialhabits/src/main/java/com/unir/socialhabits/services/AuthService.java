@@ -37,11 +37,29 @@ public class AuthService {
         Professional professional =
                 professionalRepository.findByEmail(request.getEmail())
                         .orElseThrow(() ->
-                                new RuntimeException("Invalid credentials"));
+                                new ResponseStatusException(
+                                        HttpStatus.UNAUTHORIZED,
+                                        "Invalid credentials"
+                                )
+                        );
+
+        LocalDateTime now = LocalDateTime.now();
 
         if (professional.getLockUntil() != null &&
-                professional.getLockUntil().isAfter(LocalDateTime.now())) {
-            throw new RuntimeException("Account temporarily locked");
+                professional.getLockUntil().isBefore(now)) {
+
+            professional.setLockUntil(null);
+            professional.setLoginAttempts(0);
+            professionalRepository.save(professional);
+        }
+
+        if (professional.getLockUntil() != null &&
+                professional.getLockUntil().isAfter(now)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.LOCKED,
+                    "Account locked. Try again later."
+            );
         }
 
         boolean validPassword = passwordEncoder.matches(
@@ -50,24 +68,33 @@ public class AuthService {
         );
 
         if (!validPassword) {
-            professional.setLoginAttempts(
-                    professional.getLoginAttempts() + 1
-            );
 
-            if (professional.getLoginAttempts() >= 5) {
-                professional.setLockUntil(
-                        LocalDateTime.now().plusMinutes(15)
+            int attempts = professional.getLoginAttempts() + 1;
+            professional.setLoginAttempts(attempts);
+
+            if (attempts >= 5) {
+
+                professional.setLockUntil(now.plusMinutes(1));
+                professionalRepository.save(professional);
+
+                throw new ResponseStatusException(
+                        HttpStatus.LOCKED,
+                        "Account locked. Try again in 1 minute."
                 );
             }
 
             professionalRepository.save(professional);
 
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request");
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED,
+                    "Invalid credentials. Attempts left: " + (5 - attempts)
+            );
         }
 
         professional.setLoginAttempts(0);
         professional.setLockUntil(null);
         professionalRepository.save(professional);
+
         String token = jwtService.generateToken(professional.getEmail());
 
         return new LoginResponseDTO(token);
@@ -163,7 +190,8 @@ public class AuthService {
 
         if(exists){
 
-            throw new RuntimeException(
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
                     "Email already exists"
             );
 

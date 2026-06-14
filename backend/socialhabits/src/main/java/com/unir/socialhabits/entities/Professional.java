@@ -50,6 +50,7 @@ public class Professional {
             nullable = false
     )
     @Builder.Default
+
     private int loginAttempts = 0;
 
     @Column(name = "lock_until")
