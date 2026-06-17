@@ -363,8 +363,8 @@ export default function UserDetail() {
 
                     <div>
                         {user.habitStatus === "OK" && "🟢 Good habit compliance"}
-                        {user.habitStatus === "WARNING" && "🟡 Irregular habits detected"}
-                        {user.habitStatus === "CRITICAL" && "🔴 Attention: missing habits"}
+                        {user.habitStatus === "WARNING" && "🟡 Irregular habits detected today"}
+                        {user.habitStatus === "CRITICAL" && "🔴 Attention: missing habits today"}
                     </div>
 
                     {user.hasRiskyHabitsToday && (

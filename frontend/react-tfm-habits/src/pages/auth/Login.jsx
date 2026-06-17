@@ -220,7 +220,7 @@ export default function Login() {
                     }
                     style={registerButton}
                 >
-                    Register Professional
+                    Register as a professional
                 </button>
 
                 <button
