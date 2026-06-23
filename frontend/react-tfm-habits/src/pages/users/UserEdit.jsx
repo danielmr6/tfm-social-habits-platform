@@ -24,28 +24,28 @@ export default function UserEdit() {
     const [error, setError] = useState("");
 
     useEffect(() => {
+        async function loadUser() {
+            try {
+                setLoading(true);
+
+                const data = await getUserById(id);
+
+                setForm({
+                    firstName: data.firstName || "",
+                    lastName: data.lastName || "",
+                    age: data.age || "",
+                    generalObservations: data.generalObservations || ""
+                });
+
+            } catch (e) {
+                setError("Error loading user");
+            } finally {
+                setLoading(false);
+            }
+        }
+
         loadUser();
     }, [id]);
-
-    async function loadUser() {
-        try {
-            setLoading(true);
-
-            const data = await getUserById(id);
-
-            setForm({
-                firstName: data.firstName || "",
-                lastName: data.lastName || "",
-                age: data.age || "",
-                generalObservations: data.generalObservations || ""
-            });
-
-        } catch (e) {
-            setError("Error loading user");
-        } finally {
-            setLoading(false);
-        }
-    }
 
     function handleChange(e) {
         const { name, value } = e.target;

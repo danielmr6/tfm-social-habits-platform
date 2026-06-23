@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import styles from "./UsersList.module.css";
 
 export default function UsersList() {
-
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState("");
     const navigate = useNavigate();
@@ -13,7 +12,7 @@ export default function UsersList() {
         loadUsers("");
     }, []);
 
-    async function loadUsers(currentSearch = search) {
+    async function loadUsers(currentSearch = "") {
         const data = await getUsers(currentSearch, 0, 10);
         setUsers(data.content);
     }
@@ -70,24 +69,15 @@ export default function UsersList() {
                     {users.length > 0 ? (
                         users.map((user) => (
                             <tr key={user.id} className={styles.row}>
+                                <td className={styles.td}>{user.firstName}</td>
+                                <td className={styles.td}>{user.lastName}</td>
+                                <td className={styles.td}>{user.age}</td>
 
-                                <td className={styles.td}>
-                                    {user.firstName}
-                                </td>
-
-                                <td className={styles.td}>
-                                    {user.lastName}
-                                </td>
-
-                                <td className={styles.td}>
-                                    {user.age}
-                                </td>
-
-                                {/* STATUS */}
                                 <td className={styles.td}>
                                         <span className={getStatusClass(user.habitStatus)}>
                                             {user.habitStatus}
                                         </span>
+
                                     {user.riskyHabitsToday && (
                                         <div className={styles.alert}>
                                             ⚠ Negative habits today
@@ -109,7 +99,6 @@ export default function UsersList() {
                                         View Details
                                     </button>
                                 </td>
-
                             </tr>
                         ))
                     ) : (
