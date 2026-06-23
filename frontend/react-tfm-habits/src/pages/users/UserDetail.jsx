@@ -48,6 +48,21 @@ export default function UserDetail() {
     }
 
     useEffect(() => {
+        async function loadUser() {
+            try {
+                setLoading(true);
+
+                const data = await getUserById(id);
+                setUser(data);
+
+            } catch (err) {
+                console.error(err);
+                setUser(null);
+            } finally {
+                setLoading(false);
+            }
+        }
+
         loadUser();
     }, [id]);
 
