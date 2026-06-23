@@ -25,16 +25,24 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: 456789
 
+      FRONTEND_URL: http://localhost:3000
+
+      MAIL_USERNAME: tfmsocialhabits@gmail.com
+      MAIL_PASSWORD: swrbtjfhfudpkomt
+
+      JWT_SECRET: 5jA8vL9xN2pQ7mK4sT1wY6zR3eF8uH0cB9dX2nM5qP7kL1vR
+      JWT_EXPIRATION: 86400000
+
   frontend:
-    build:
-      context: ./frontend/react-tfm-habits
-    container_name: socialhabits-front
-    depends_on:
-      - backend
-    ports:
-      - "3000:3000"
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
+      build:
+        context: ./frontend/react-tfm-habits
+      container_name: socialhabits-front
+      depends_on:
+        - backend
+      ports:
+        - "3000:3000"
+      environment:
+        CHOKIDAR_USEPOLLING: "true"
 
 volumes:
   postgres_data:

@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "http://localhost:8080",
+    baseURL: process.env.REACT_APP_API_URL,
 });
 
 // Endpoints públicos
@@ -14,10 +14,7 @@ const publicEndpoints = new Set([
 
 api.interceptors.request.use((config) => {
 
-    const url = config.url || "";
-
-    // normalizar URL (quita dominio si viene completo)
-    const path = url.replace("http://localhost:8080", "");
+    const path = config.url || "";
 
     const isPublic = Array.from(publicEndpoints).some(endpoint =>
         path.startsWith(endpoint)
@@ -31,7 +28,6 @@ api.interceptors.request.use((config) => {
             config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;
         }
-
     }
 
     return config;

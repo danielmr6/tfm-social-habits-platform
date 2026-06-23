@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +23,9 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 @RequiredArgsConstructor
 public class AuthService {
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
+
     private final JwtService jwtService;
 
     private final ProfessionalRepository professionalRepository;
@@ -133,8 +137,7 @@ public class AuthService {
 
         tokenRepository.save(resetToken);
 
-        String link = "http://localhost:3000/reset-password?token=" + token;
-
+        String link = frontendUrl + "/reset-password?token=" + token;
         emailService.send(
                 email,
                 "Password recovery",
