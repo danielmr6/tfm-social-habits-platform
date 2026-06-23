@@ -25,9 +25,7 @@ export default function UsersList() {
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.title}>
-                Summary of my users
-            </h1>
+            <h1 className={styles.title}>Summary of my users</h1>
 
             <p className={styles.subtitle}>
                 Overview of activity, status and habit compliance
@@ -79,15 +77,11 @@ export default function UsersList() {
                                         </span>
 
                                     {user.riskyHabitsToday && (
-                                        <div className={styles.alert}>
-                                            ⚠ Negative habits today
-                                        </div>
+                                        <div className={styles.alert}>⚠ Negative habits today</div>
                                     )}
 
                                     {user.missingTodayHabits && (
-                                        <div className={styles.alert}>
-                                            ❌ Today incomplete
-                                        </div>
+                                        <div className={styles.alert}>❌ Today incomplete</div>
                                     )}
                                 </td>
 

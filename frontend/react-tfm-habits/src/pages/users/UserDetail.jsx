@@ -32,15 +32,13 @@ export default function UserDetail() {
     const [selectedObservation, setSelectedObservation] = useState(null);
     const [observationText, setObservationText] = useState("");
 
-    useEffect(() => {
-        loadUser();
-    }, [id]);
-
     async function loadUser() {
         try {
             setLoading(true);
+
             const data = await getUserById(id);
             setUser(data);
+
         } catch (err) {
             console.error(err);
             setUser(null);
@@ -48,6 +46,10 @@ export default function UserDetail() {
             setLoading(false);
         }
     }
+
+    useEffect(() => {
+        loadUser();
+    }, [id]);
 
     async function handleDownloadReport() {
         try {
@@ -88,6 +90,7 @@ export default function UserDetail() {
 
     function handleDeleteUser() {
         setSelectedHabit(null);
+        setSelectedObservation(null);
         setShowDeleteModal(true);
     }
 
