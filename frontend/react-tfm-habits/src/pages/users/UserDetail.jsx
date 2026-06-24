@@ -278,32 +278,85 @@ export default function UserDetail() {
 
             {/* OBSERVATIONS */}
             <div className={styles.section}>
+
                 <h3>Observations</h3>
 
-                <textarea
-                    value={observationText}
-                    onChange={(e) => setObservationText(e.target.value)}
-                />
+                <div className={styles.observationForm}>
 
-                <button onClick={handleCreateObservation}>
-                    Add Observation
-                </button>
+                    <textarea
+                        value={observationText}
+                        placeholder="Add observation..."
+                        onChange={(e) =>
+                            setObservationText(e.target.value)
+                        }
+                    />
+
+                    <button
+                        className={styles.addObservationBtn}
+                        onClick={handleCreateObservation}
+                    >
+                        Add Observation
+                    </button>
+
+                </div>
 
                 {user.observations?.length > 0 ? (
-                    user.observations.map((o) => (
-                        <div key={o.id}>
-                            <p>{o.content}</p>
 
-                            <button
-                                onClick={() => handleDeleteObservation(o.id)}
+                    <div className={styles.timeline}>
+
+                        {user.observations.map((o) => (
+
+                            <div
+                                key={o.id}
+                                className={styles.obsItem}
                             >
-                                Remove
-                            </button>
-                        </div>
-                    ))
+
+                                <div className={styles.obsHeader}>
+
+                        <span>
+                            {o.professionalName ||
+                                "Unknown professional"}
+                        </span>
+
+                                    <small>
+                                        {o.createdAt
+                                            ? new Date(
+                                                o.createdAt
+                                            ).toLocaleString()
+                                            : "-"}
+                                    </small>
+
+                                </div>
+
+                                <p>{o.content}</p>
+
+                                <button
+                                    className={
+                                        styles.deleteObservationBtn
+                                    }
+                                    onClick={() =>
+                                        handleDeleteObservation(
+                                            o.id
+                                        )
+                                    }
+                                >
+                                    Remove Observation
+                                </button>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
                 ) : (
-                    <p>No observations</p>
+
+                    <p className={styles.empty}>
+                        No observations
+                    </p>
+
                 )}
+
             </div>
 
             {/* MODAL */}
@@ -311,18 +364,50 @@ export default function UserDetail() {
                 <div className={styles.modalOverlay}>
                     <div className={styles.confirmCard}>
 
-                        <h2>Confirm delete</h2>
+                        <h2>
+                            {selectedHabit
+                                ? "Delete Habit"
+                                : selectedObservation
+                                    ? "Delete Observation"
+                                    : "Delete User"}
+                        </h2>
 
-                        <button onClick={() => setShowDeleteModal(false)}>
-                            Cancel
-                        </button>
+                        <p>
+                            {selectedHabit
+                                ? "Are you sure you want to delete this habit?"
+                                : selectedObservation
+                                    ? "Are you sure you want to delete this observation?"
+                                    : (
+                                        <>
+                                            Are you sure you want to delete{" "}
+                                            <strong>
+                                                {user.firstName} {user.lastName}
+                                            </strong>
+                                            ?
+                                        </>
+                                    )}
+                        </p>
 
-                        <button
-                            onClick={confirmDelete}
-                            disabled={deleting}
-                        >
-                            {deleting ? "Deleting..." : "Delete"}
-                        </button>
+                        <div className={styles.modalActions}>
+                            <button
+                                className={styles.cancelBtn}
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setSelectedHabit(null);
+                                    setSelectedObservation(null);
+                                }}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                className={styles.deleteBtnDanger}
+                                onClick={confirmDelete}
+                                disabled={deleting}
+                            >
+                                {deleting ? "Deleting..." : "Delete"}
+                            </button>
+                        </div>
 
                     </div>
                 </div>
