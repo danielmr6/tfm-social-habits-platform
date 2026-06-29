@@ -14,17 +14,23 @@ const publicEndpoints = new Set([
 
 api.interceptors.request.use((config) => {
 
-    const path = config.url || "";
+    const url = config.url || "";
 
-    const isPublic = Array.from(publicEndpoints).some(endpoint =>
-        path.startsWith(endpoint)
-    );
+    // normalize: remove query params
+    const cleanPath = url.split("?")[0];
+
+    const isPublic = [
+        "/auth/login",
+        "/auth/register",
+        "/auth/forgot-password",
+        "/auth/reset-password"
+    ].some(endpoint => cleanPath.includes(endpoint));
 
     if (!isPublic) {
 
         const token = localStorage.getItem("token");
 
-        if (token) {
+        if (token && token !== "null" && token !== "undefined") {
             config.headers = config.headers || {};
             config.headers.Authorization = `Bearer ${token}`;
         }
