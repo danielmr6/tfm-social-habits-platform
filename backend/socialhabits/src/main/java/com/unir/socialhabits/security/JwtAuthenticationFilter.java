@@ -35,7 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String path = request.getServletPath();
-
+        
         if (path.startsWith("/auth/")
                 || path.startsWith("/v3/")
                 || path.startsWith("/swagger")
@@ -47,11 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null ||
-                !authHeader.startsWith("Bearer ") ||
-                authHeader.equals("Bearer null") ||
-                authHeader.equals("Bearer undefined")) {
-
+        // No token → just continue (do NOT block here)
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
