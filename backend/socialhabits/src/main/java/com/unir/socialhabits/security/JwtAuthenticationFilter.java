@@ -34,104 +34,57 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String path =
-                request.getRequestURI();
+        String path = request.getServletPath();
+        
+        if (path.startsWith("/auth/")
+                || path.startsWith("/v3/")
+                || path.startsWith("/swagger")
+                || request.getMethod().equals("OPTIONS")) {
 
-        if (path.startsWith("/auth/")) {
-
-            filterChain.doFilter(
-                    request,
-                    response
-            );
-
+            filterChain.doFilter(request, response);
             return;
         }
 
-        String authHeader =
-                request.getHeader(
-                        "Authorization"
-                );
+        String authHeader = request.getHeader("Authorization");
 
-        if (
-                authHeader == null ||
-                        !authHeader.startsWith("Bearer ")
-        ) {
-
-            filterChain.doFilter(
-                    request,
-                    response
-            );
-
+        // No token → just continue (do NOT block here)
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            String token = authHeader.substring(7);
 
-            String token =
-                    authHeader.substring(7);
+            String email = jwtService.extractUsername(token);
 
-            String email =
-                    jwtService.extractUsername(
-                            token
-                    );
-
-            if (
-                    email != null &&
-                            SecurityContextHolder
-                                    .getContext()
-                                    .getAuthentication()
-                                    == null
-            ) {
+            // already authenticated → skip
+            if (email != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
 
                 UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(email);
 
-                        userDetailsService
-                                .loadUserByUsername(
-                                        email
-                                );
-
-                if (
-                        jwtService.isValid(
-                                token
-                        )
-                ) {
+                if (jwtService.isValid(token)) {
 
                     UsernamePasswordAuthenticationToken auth =
-
                             new UsernamePasswordAuthenticationToken(
-
                                     userDetails,
-
                                     null,
-
                                     userDetails.getAuthorities()
-
                             );
 
                     auth.setDetails(
-
-                            new WebAuthenticationDetailsSource()
-
-                                    .buildDetails(request)
-
+                            new WebAuthenticationDetailsSource().buildDetails(request)
                     );
 
-                    SecurityContextHolder
-
-                            .getContext()
-
-                            .setAuthentication(auth);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
 
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
+        } catch (Exception ex) {
         }
 
-        filterChain.doFilter(
-                request,
-                response
-        );
+        filterChain.doFilter(request, response);
     }
 }
