@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -107,42 +108,29 @@ public class AuthService {
     @Transactional
     public void sendPasswordReset(String email){
 
-        Professional professional =
-                professionalRepository
-                        .findByEmail(email)
-                        .orElseThrow(
-                                () ->
-                                        new ResponseStatusException(
-                                                HttpStatus.NOT_FOUND,
-                                                "Invalid request"
-                                        )
-                        );
+        Optional<Professional> professionalOpt =
+                professionalRepository.findByEmail(email);
 
-        String token =
-                UUID.randomUUID().toString();
+        if (professionalOpt.isEmpty()) {
+            return;
+        }
+
+        Professional professional = professionalOpt.get();
 
         tokenRepository.deleteByEmail(email);
 
-        PasswordResetToken resetToken =
-                new PasswordResetToken();
+        String token = UUID.randomUUID().toString();
 
+        PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setToken(token);
-
         resetToken.setEmail(email);
-
-        resetToken.setExpiryDate(
-                LocalDateTime.now()
-                        .plusMinutes(15)
-        );
+        resetToken.setExpiryDate(LocalDateTime.now().plusMinutes(15));
 
         tokenRepository.save(resetToken);
 
         String link = frontendUrl + "/reset-password?token=" + token;
-        emailService.send(
-                email,
-                "Password recovery",
-                "Click here to reset your password:\n" + link
-        );
+
+        emailService.send(email, "Password recovery", "Click here:\n" + link);
     }
 
     /**
