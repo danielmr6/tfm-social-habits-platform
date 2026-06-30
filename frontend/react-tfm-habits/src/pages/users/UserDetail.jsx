@@ -259,8 +259,19 @@ export default function UserDetail() {
                     <div className={styles.grid}>
                         {user.habits.map((h) => (
                             <div key={h.id} className={styles.habitCard}>
+
+                                <div className={styles.badge}>
+                                    {h.type}
+                                </div>
+
                                 <p><b>Status:</b> {h.status}</p>
-                                <p>{h.description}</p>
+
+                                <p>
+                                    <b>Date:</b>{" "}
+                                    {h.date
+                                        ? new Date(h.date).toLocaleDateString()
+                                        : "-"}
+                                </p>
 
                                 <button
                                     className={styles.deleteHabitBtn}
