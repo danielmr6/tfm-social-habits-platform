@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 @RestController
 public class NetworkTestController {
@@ -17,5 +21,21 @@ public class NetworkTestController {
         } catch (Exception e) {
             return e.toString();
         }
+    }
+
+    @GetMapping("/google")
+    public String google() throws Exception {
+
+        HttpClient client = HttpClient.newHttpClient();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create("https://www.google.com"))
+                .GET()
+                .build();
+
+        HttpResponse<String> response =
+                client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        return String.valueOf(response.statusCode());
     }
 }
