@@ -16,7 +16,7 @@ public class NetworkTestController {
     @GetMapping("/smtp-test")
     public String smtpTest() {
         try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress("smtp.gmail.com", 587), 5000);
+            socket.connect(new InetSocketAddress("google.com", 443), 5000);
             return "Conexión OK";
         } catch (Exception e) {
             return e.toString();
