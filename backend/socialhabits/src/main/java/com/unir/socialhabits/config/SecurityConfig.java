@@ -50,9 +50,7 @@ public class SecurityConfig {
                                 "/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/smtp-test",
-                                "/google"
+                                "/swagger-ui.html"
                         ).permitAll()
 
                         // PRE-FLIGHT REQUESTS
