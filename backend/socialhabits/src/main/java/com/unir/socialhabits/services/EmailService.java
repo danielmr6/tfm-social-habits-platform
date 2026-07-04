@@ -1,36 +1,42 @@
 package com.unir.socialhabits.services;
 
 import lombok.RequiredArgsConstructor;
-
-import org.springframework.mail.SimpleMailMessage;
-
-import org.springframework.mail.javamail.JavaMailSender;
-
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    @Value("${resend.api.key}")
+    private String apiKey;
 
-    public void send(
-            String to,
-            String subject,
-            String body
-    ){
+    @Value("${resend.from}")
+    private String from;
 
-        SimpleMailMessage message =
-                new SimpleMailMessage();
+    private final RestClient restClient = RestClient.create();
 
-        message.setTo(to);
+    public void send(String to, String subject, String body) {
 
-        message.setSubject(subject);
+        Map<String, Object> request = Map.of(
+                "from", from,
+                "to", List.of(to),
+                "subject", subject,
+                "text", body
+        );
 
-        message.setText(body);
-
-        mailSender.send(message);
-
+        restClient.post()
+                .uri("https://api.resend.com/emails")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(request)
+                .retrieve()
+                .toBodilessEntity();
     }
-
 }

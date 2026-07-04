@@ -27,8 +27,8 @@ services:
 
       FRONTEND_URL: http://localhost:3000
 
-      MAIL_USERNAME: tfmsocialhabits@gmail.com
-      MAIL_PASSWORD: swrbtjfhfudpkomt
+      RESEND_API_KEY: re_Uob9raZw_3WsJQA1D55WVgQ8Gn3sgkFyT
+      RESEND_FROM: onboarding@resend.dev
 
       JWT_SECRET: 5jA8vL9xN2pQ7mK4sT1wY6zR3eF8uH0cB9dX2nM5qP7kL1vR
       JWT_EXPIRATION: 86400000
